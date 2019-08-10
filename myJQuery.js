@@ -1,14 +1,26 @@
 (function (document, window) {
 
   function myjQuery (selector, from) {
-    var fromEl = from || document;
-    var elS;
+    var elS, _this = this;
     if (typeof selector === 'string') { // cuando se pasa selector
-      var elAll = fromEl.querySelectorAll(selector.trim());
-      if (!elAll.length) return console.log(selector + ' no encontrado.');
+      var fromEl = document;
+      var elAll;
+      var selectorTrim = selector.trim();
+      if (from !== undefined) {
+        elAll = [];
+        from.forEach( function (el) {
+          _this._map(el.querySelectorAll(selectorTrim)).forEach( function (node) { elAll.push(node) });
+        });
+      } else {
+        elAll = fromEl.querySelectorAll(selectorTrim);
+      }
       elS = this._map(elAll);
     } else { // cuando se pasa un nodo(s)...
-      elS = selector.length ? this._map(selector) : [selector];
+      if (selector.length) {
+        elS = this._map(selector);
+      } else {
+        elS = !Array.isArray(selector) ? [selector] : [];
+      }
     }
     this.elS = elS;
     this.length = this.elS.length;
@@ -37,10 +49,16 @@
   };
 
   myProto._ccpnps = function (nameMethod) {
-    var _this = this;
-    var items = [];
+    var _this = this, items = [], fnGo;
     this.elS.forEach( function (el) {
-      _this._map(el[nameMethod]).forEach( function (item) { items.push(item) });
+      fnGo = el[nameMethod];
+      if (fnGo !== null) {
+        if (fnGo.length) {
+          _this._map(fnGo).forEach( function (item) { items.push(item) });
+        } else {
+          if (!HTMLCollection.prototype.isPrototypeOf(fnGo)) items.push(fnGo);
+        }
+      }
     });
     return items;
   };
@@ -56,16 +74,15 @@
   };
   
   myProto._classList = function (nameS, type) {
-    var _this = this;
-    var elS = this.elS;
-    if (!elS.length) return console.log('ClassList.' + type + ' , sin hijos.');
-    var csReturn = false;
-    nameS.split(' ').forEach( function (nameClass) {
-      elS.forEach( function (el) {
-        if (!csReturn) csReturn = _this._clTypes(type, el, nameClass);
-      })
-    });
-    if (type === 'contains') _this = csReturn;
+    var _this = this, elS = this.elS, csReturn = false;
+    if (elS.length) {
+      nameS.split(' ').forEach( function (nameClass) {
+        elS.forEach( function (el) {
+          if (!csReturn) csReturn = _this._clTypes(type, el, nameClass);
+        })
+      });
+      if (type === 'contains') _this = csReturn;
+    }
     return _this;
   };
 
@@ -91,19 +108,13 @@
 
   myProto.attr = function (nameAttr, valAttr) {
     var _this = this;
-    if (valAttr) {
-      this._forEach('setAttribute', nameAttr, valAttr)
-    } else {
-      _this = this.elS[0].getAttribute(nameAttr);
-    }
+    valAttr ? this._forEach('setAttribute', nameAttr, valAttr) : _this = this.elS[0].getAttribute(nameAttr);
     return _this;
   };
 
   myProto.removeAttr = function (nameAttrS) {
     var _this = this;
-    nameAttrS.split(' ').forEach( function (nameAttr) {
-      _this._forEach('removeAttribute', nameAttr)
-    });
+    nameAttrS.split(' ').forEach( function (nameAttr) { _this._forEach('removeAttribute', nameAttr) });
     return this;
   };
 
@@ -130,16 +141,12 @@
   };
 
   myProto.remove = function () {
-    this.elS.forEach(function (el) {
-      el.parentNode.removeChild(el);
-    });
+    this.elS.forEach(function (el) { el.parentNode.removeChild(el) });
     return this;
   };
 
   myProto.empty = function () {
-    this.elS.forEach(function (el) {
-      el.innerHTML = '';
-    });
+    this.elS.forEach(function (el) { el.innerHTML = '' });
     return this;
   };
 
@@ -160,15 +167,27 @@
   };
 
   myProto.prev = function () {
-    return jQuery(this._ccpnps('prevElementSibling'));
+    return jQuery(this._ccpnps('previousElementSibling'));
   };
   
   myProto.siblings = function () {
-    // a trabajar
+    var siblings = [];
+    this.elS.forEach( function (el) {
+      Array.prototype.forEach.call(el.parentNode.children, function(child){
+        if (child !== el) siblings.push(child);
+      });
+    });
+    return jQuery(siblings);
   };
   
   myProto.find = function (selector) {
-    // a trabajar
+    return jQuery(selector, this.elS);
+  };
+
+  myProto.each = function (cb) {
+    this.elS.forEach( function (i, e) {
+      cb(i, e);
+    });
   };
 
 }(document, window));
