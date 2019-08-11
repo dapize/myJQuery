@@ -86,18 +86,31 @@
     return _this;
   };
 
-  myProto.on = function (event, cb) {
-    return this._forEach('addEventListener', event, cb)
+  myProto._closest = function (el, selector) {
+    var ancestor = el;
+		do {
+			if (ancestor.matches(selector)) return ancestor;
+			ancestor = ancestor.parentNode;
+    } while (ancestor !== null);
+		return null;
+  }
+
+
+  // Essentials
+
+  myProto.each = function (cb) {
+    this.elS.forEach( function (i, e) {
+      cb(i, e);
+    });
   };
 
-  myProto.hasClass = function (nameS) {
-    return this._classList(nameS, 'contains');
-  };
-  
+
+  // Class attribute
+
   myProto.addClass = function (nameS) {
     return this._classList(nameS, 'add');
   };
-  
+
   myProto.removeClass = function (nameS) {
     return this._classList(nameS, 'remove');
   };
@@ -106,6 +119,13 @@
     return this._classList(nameS, 'toggle');
   };
 
+  myProto.hasClass = function (nameS) {
+    return this._classList(nameS, 'contains');
+  };
+  
+
+  // General attributes
+  
   myProto.attr = function (nameAttr, valAttr) {
     var _this = this;
     valAttr ? this._forEach('setAttribute', nameAttr, valAttr) : _this = this.elS[0].getAttribute(nameAttr);
@@ -116,6 +136,52 @@
     var _this = this;
     nameAttrS.split(' ').forEach( function (nameAttr) { _this._forEach('removeAttribute', nameAttr) });
     return this;
+  };
+
+  myProto.val = function () {
+    return this.elS[0].value;
+  };
+
+
+  // Insertion inside
+
+  myProto.append = function () {
+    if (!arguments.length) return this;
+    var docFrag = document.createDocumentFragment();
+    Array.prototype.slice.call(arguments).forEach( function (node) {
+      if (Array.isArray(node)) {
+        node.forEach( function (el) {
+          if (el.elS) { // node jquery
+            el.elS.forEach (function (nodeJquery) {
+              docFrag.append(nodeJquery)
+            });
+          } else if (el instanceof Node) {
+            docFrag.append(el)
+          } else { // puede ser string texto o DOM String // TRABAJAR EN ESTO
+            docFrag.append(document.createTextNode(el));
+          }
+        });
+      } else if (node.elS) { // node myJquery
+        node.elS.forEach (function (nodeJquery) {
+          docFrag.append(nodeJquery);
+        });
+      } else if (typeof node === 'string') {
+        // puede ser string texto o DOM String // TRABAJAR EN ESTO
+        docFrag.insertAdjacentHTML('afterend', node);
+      } else {
+        docFrag.append(node);
+      }
+    });
+    this.elS.forEach( function (el) {
+      el.appendChild(docFrag);
+    });
+    return this;
+  };
+
+  myProto.html = function (html) {
+    var _this = this;
+    html ? this.elS[0].innerHTML = html : _this = this.elS[0].innerHTML;
+    return _this;
   };
 
   myProto.text = function (txt) {
@@ -130,14 +196,13 @@
     return _this;
   };
 
-  myProto.val = function () {
-    return this.elS[0].value;
-  };
 
-  myProto.html = function (html) {
-    var _this = this;
-    html ? this.elS[0].innerHTML = html : _this = this.elS[0].innerHTML;
-    return _this;
+  // Removal
+
+  myProto.detach = function () {
+    var docFrag = document.createDocumentFragment();
+    this.elS.forEach( function (el) { docFrag.appendChild(el) });
+    return jQuery(docFrag.children);
   };
 
   myProto.remove = function () {
@@ -150,6 +215,9 @@
     return this;
   };
 
+
+  //Tree traversal
+
   myProto.children = function () {
     return jQuery(this._ccpnps('children'));
   };
@@ -158,8 +226,19 @@
     return jQuery(this._ccpnps('childNodes'));
   };
 
-  myProto.parent = function () {
-    return jQuery(this._ccpnps('parentNode'));
+  myProto.closest = function (selector, elEnd) {
+    var _this = this;
+    var closest = [];
+    var itemFound;
+    this.elS.forEach( function (el) {
+      itemFound = _this._closest(el, selector);
+      if (itemFound && closest.indexOf(itemFound) === -1) closest.push(itemFound);
+    });
+    return jQuery(closest);
+  };
+
+  myProto.find = function (selector) {
+    return jQuery(selector, this.elS);
   };
 
   myProto.next = function () {
@@ -169,7 +248,11 @@
   myProto.prev = function () {
     return jQuery(this._ccpnps('previousElementSibling'));
   };
-  
+
+  myProto.parent = function () {
+    return jQuery(this._ccpnps('parentNode'));
+  };
+
   myProto.siblings = function () {
     var siblings = [];
     this.elS.forEach( function (el) {
@@ -179,15 +262,45 @@
     });
     return jQuery(siblings);
   };
+
   
-  myProto.find = function (selector) {
-    return jQuery(selector, this.elS);
+  // Filtering
+
+  myProto.eq = function (index) {
+    return jQuery([this.elS[index]]);
   };
 
-  myProto.each = function (cb) {
-    this.elS.forEach( function (i, e) {
-      cb(i, e);
+  myProto.first = function () {
+    return this.eq(0);
+  };
+
+  myProto.last = function () {
+    return this.eq(this.elS.length - 1);
+  }
+
+  myProto.slice = function (iStart, iEnd) {
+    return jQuery(this.elS.slice(iStart, iEnd));
+  }
+
+
+  // Events
+
+  myProto.on = function (eventName, cb) { //falta agregar recibir objeto
+    return this._forEach('addEventListener', eventName, cb)
+  };
+
+  myProto.one = function (eventName, cb) {
+    this.elS.forEach( function (el) {
+      el.addEventListener(eventName, function (event) {
+        cb();
+        event.target.removeEventListener(event.type, arguments.callee);
+      })
     });
+    return this;
+  };
+
+  myProto.off = function (eventName, cb) { // solo off();
+    return this._forEach('removeEventListener', eventName, cb)
   };
 
 }(document, window));
