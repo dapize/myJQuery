@@ -1,0 +1,53 @@
+// Insertion inside
+appendTo
+prepend
+prependTo
+
+
+// Insertion outside
+before
+insertBefore
+after
+insertAfter
+
+
+// Insertion around
+wrap
+wrapAll
+wrapInner
+unwrap
+
+
+// Tree traversal
+parent
+parents
+parentsUntil
+
+
+// Filtering
+is
+has
+not
+filter
+map
+
+
+// Style properties
+css
+width
+height
+innerWidth
+innerHeight
+outerWidth
+outerHeight
+scrollTop
+scrollLeft
+position
+offset
+
+
+// Events
+on
+off
+one
+trigger

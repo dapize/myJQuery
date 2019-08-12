@@ -95,6 +95,23 @@
 		return null;
   }
 
+  myProto._nextsPrevs = function (selector, type, element) { // true = all, false = until
+    var elements = [];
+    var elNode;
+    this.elS.forEach( function (el) {
+      elNode = el[element];
+      while(elNode !== null) {
+        if (selector === undefined) {
+          elements.push(elNode);
+        } else if (elNode.matches(selector) === type) {
+          elements.push(elNode);
+        }
+        elNode = elNode[element];
+      }
+    });
+    return elements;
+  }
+
 
   // Essentials
 
@@ -216,7 +233,7 @@
   };
 
 
-  //Tree traversal
+  // Tree traversal
 
   myProto.children = function () {
     return jQuery(this._ccpnps('children'));
@@ -245,8 +262,24 @@
     return jQuery(this._ccpnps('nextElementSibling'));
   };
 
+  myProto.nextAll = function (selector) {
+    return jQuery(this._nextsPrevs(selector, true, 'nextElementSibling'));
+  };
+
+  myProto.nextUntil = function (selector) {
+    return jQuery(this._nextsPrevs(selector, false, 'nextElementSibling'));
+  };
+
   myProto.prev = function () {
     return jQuery(this._ccpnps('previousElementSibling'));
+  };
+
+  myProto.prevAll = function (selector) {
+    return jQuery(this._nextsPrevs(selector, true, 'previousElementSibling'));
+  };
+
+  myProto.prevUntil = function (selector) {
+    return jQuery(this._nextsPrevs(selector, false, 'previousElementSibling'));
   };
 
   myProto.parent = function () {
