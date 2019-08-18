@@ -54,9 +54,13 @@
       fnGo = el[nameMethod];
       if (fnGo !== null) {
         if (fnGo.length) {
-          _this._map(fnGo).forEach( function (item) { items.push(item) });
+          _this._map(fnGo).forEach( function (item) {
+            if (items.indexOf(item) === -1) items.push(item)
+          });
         } else {
-          if (!HTMLCollection.prototype.isPrototypeOf(fnGo)) items.push(fnGo);
+          if (!HTMLCollection.prototype.isPrototypeOf(fnGo)) {
+            if (items.indexOf(fnGo) === -1) items.push(fnGo)
+          }
         }
       }
     });
@@ -86,27 +90,21 @@
     return _this;
   };
 
-  myProto._closest = function (el, selector) {
-    var ancestor = el;
-		do {
-			if (ancestor.matches(selector)) return ancestor;
-			ancestor = ancestor.parentNode;
-    } while (ancestor !== null);
-		return null;
-  }
-
-  myProto._nextsPrevs = function (selector, type, element) { // true = all, false = until
-    var elements = [];
-    var elNode;
+  // nexts: n , prevs: p, parents: p, closests: c
+  myProto._nppc = function (selector, type, methodName, theFirst) {
+    var elements = [], elNode, justOne = false;
     this.elS.forEach( function (el) {
-      elNode = el[element];
-      while(elNode !== null) {
-        if (selector === undefined) {
-          elements.push(elNode);
-        } else if (elNode.matches(selector) === type) {
-          elements.push(elNode);
+      elNode = el[methodName];
+      while(elNode !== null && Element.prototype.isPrototypeOf(elNode) && !justOne) {
+        if (elements.indexOf(elNode) === -1) {
+          if (selector === undefined) {
+            elements.push(elNode);
+          } else if (elNode.matches(selector) === type) {
+            elements.push(elNode);
+            if (theFirst) justOne = true;
+          }
         }
-        elNode = elNode[element];
+        elNode = elNode[methodName];
       }
     });
     return elements;
@@ -243,15 +241,18 @@
     return jQuery(this._ccpnps('childNodes'));
   };
 
-  myProto.closest = function (selector, elEnd) {
-    var _this = this;
-    var closest = [];
-    var itemFound;
-    this.elS.forEach( function (el) {
-      itemFound = _this._closest(el, selector);
-      if (itemFound && closest.indexOf(itemFound) === -1) closest.push(itemFound);
-    });
-    return jQuery(closest);
+  myProto.closest = function (selector) {
+    var arrClosest = [];
+    if (Element.prototype.closest) {
+      var closest;
+      this.elS.forEach(function (el) {
+        closest = el.parentNode.closest(selector);
+        if (closest !== null) arrClosest.push(closest);
+      });
+    } else {
+      arrClosest = this._nppc(selector, true, 'parentNode', true);
+    }
+    return jQuery(arrClosest);
   };
 
   myProto.find = function (selector) {
@@ -263,11 +264,11 @@
   };
 
   myProto.nextAll = function (selector) {
-    return jQuery(this._nextsPrevs(selector, true, 'nextElementSibling'));
+    return jQuery(this._nppc(selector, true, 'nextElementSibling'));
   };
 
   myProto.nextUntil = function (selector) {
-    return jQuery(this._nextsPrevs(selector, false, 'nextElementSibling'));
+    return jQuery(this._nppc(selector, false, 'nextElementSibling'));
   };
 
   myProto.prev = function () {
@@ -275,15 +276,23 @@
   };
 
   myProto.prevAll = function (selector) {
-    return jQuery(this._nextsPrevs(selector, true, 'previousElementSibling'));
+    return jQuery(this._nppc(selector, true, 'previousElementSibling'));
   };
 
   myProto.prevUntil = function (selector) {
-    return jQuery(this._nextsPrevs(selector, false, 'previousElementSibling'));
+    return jQuery(this._nppc(selector, false, 'previousElementSibling'));
   };
 
   myProto.parent = function () {
     return jQuery(this._ccpnps('parentNode'));
+  };
+
+  myProto.parents = function (selector) {
+    return jQuery(this._nppc(selector, true, 'parentNode'));
+  };
+
+  myProto.parentsUntil = function (selector) {
+    return jQuery(this._nppc(selector, false, 'parentNode'));
   };
 
   myProto.siblings = function () {

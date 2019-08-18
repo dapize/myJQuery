@@ -23,6 +23,8 @@ parent
 parents
 parentsUntil
 
+nextsPrevsParents = function (selector, type, element)
+
 
 // Filtering
 is
