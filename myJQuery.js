@@ -58,7 +58,7 @@
             if (items.indexOf(item) === -1) items.push(item)
           });
         } else {
-          if (!HTMLCollection.prototype.isPrototypeOf(fnGo)) {
+          if (!HTMLCollection.prototype.isPrototypeOf.call(fnGo)) {
             if (items.indexOf(fnGo) === -1) items.push(fnGo)
           }
         }
@@ -67,7 +67,7 @@
     return items;
   };
 
-  myProto._clTypes = function (type, el, nameClass) {
+  myProto._classListTypes = function (type, el, nameClass) {
     var clReturn = false;
     if (type === 'add' || type === 'remove' || type === 'toggle') {
       el.classList[type](nameClass);
@@ -82,7 +82,7 @@
     if (elS.length) {
       nameS.split(' ').forEach( function (nameClass) {
         elS.forEach( function (el) {
-          if (!csReturn) csReturn = _this._clTypes(type, el, nameClass);
+          if (!csReturn) csReturn = _this._classListTypes(type, el, nameClass);
         })
       });
       if (type === 'contains') _this = csReturn;
@@ -90,12 +90,24 @@
     return _this;
   };
 
+  myProto._classListFn = function (nameS, type) {
+    var preName = type === 'contains' ? 'has' : type;
+    if (typeof nameS === 'function') {
+      this.elS.forEach(function (item, index) {
+        jQuery(item)[preName + 'Class'](nameS.call(item, index, item.getAttribute('class')));
+      });
+    } else {
+      this._classList(nameS, type);
+    }
+    return this;
+  };
+
   // nexts: n , prevs: p, parents: p, closests: c
   myProto._nppc = function (selector, type, methodName, theFirst) {
     var elements = [], elNode, justOne = false;
     this.elS.forEach( function (el) {
       elNode = el[methodName];
-      while(elNode !== null && Element.prototype.isPrototypeOf(elNode) && !justOne) {
+      while(elNode !== null && Element.prototype.isPrototypeOf.call(elNode) && !justOne) {
         if (elements.indexOf(elNode) === -1) {
           if (selector === undefined) {
             elements.push(elNode);
@@ -123,11 +135,11 @@
   // Class attribute
 
   myProto.addClass = function (nameS) {
-    return this._classList(nameS, 'add');
+    return this._classListFn(nameS, 'add');
   };
 
   myProto.removeClass = function (nameS) {
-    return this._classList(nameS, 'remove');
+    return this._classListFn(nameS, 'remove');
   };
 
   myProto.toggleClass = function (nameS) {
@@ -220,8 +232,16 @@
     return jQuery(docFrag.children);
   };
 
-  myProto.remove = function () {
-    this.elS.forEach(function (el) { el.parentNode.removeChild(el) });
+  myProto.remove = function (selector) {
+    this.elS.forEach(function (el) {
+      if (selector) {
+        if (el.matches(selector)) {
+          el.parentNode.removeChild(el)
+        }
+      } else {
+        el.parentNode.removeChild(el)
+      }
+    });
     return this;
   };
 
