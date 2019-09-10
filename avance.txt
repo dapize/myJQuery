@@ -1,0 +1,8 @@
+* SELECTOR
+  - clases: si
+  - ids: si
+  - tags: si
+  - nodo: si
+  - nodos: si (iterable)
+  - objetos jquery: si
+  - objetos literales: aun...
