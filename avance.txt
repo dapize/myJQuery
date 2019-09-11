@@ -5,4 +5,12 @@
   - nodo: si
   - nodos: si (iterable)
   - objetos jquery: si
-  - objetos literales: aun...
+  - objetos literales: si
+
+  metodos para jQueryObj
+    .data()
+    .prop()
+    .on()
+    .off()
+    .trigger()
+    .triggerHandler()
