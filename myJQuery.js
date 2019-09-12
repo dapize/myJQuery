@@ -8,6 +8,11 @@
   const jQprotoObj = jQueryObj.prototype;
 
   jQprotoObj.data = function (keyName, value) {
+    const el0 = this[0]
+    let valData
+    if (Element.prototype.isPrototypeOf(el0)) {
+      return el0.dataset[keyName]
+    }
     
   }
 
@@ -17,7 +22,6 @@
     obj[keyName] = value
     return obj
   }
-
 
 
   function jQuery (selector, context) {
