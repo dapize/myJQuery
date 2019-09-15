@@ -87,28 +87,21 @@
     return obj
   }
 
-
   // Jquery Nodes
   function jQuery (selector, context) {
-    const _this = this
-    if (selector instanceof arguments.callee) { // si se pasa un objecto jquery
-      Object.keys(selector).forEach(function (key) {
-        _this[key] = selector[key]
-      })
-    } else {
-      if (selector) { // se pasó algo, veamos que es...
-        let elements
-        context = context || document
-        if (typeof selector === 'string') { // ... un selector CSS
-          elements = context.querySelectorAll(selector.trim())
-        } else { // ... un nodo iterable
-          elements = (NodeList.prototype.isPrototypeOf(selector) || HTMLCollection.prototype.isPrototypeOf(selector)) ? selector : [selector]
-        }
-        Array.prototype.forEach.call(elements, function (node, index) {
-          _this[index] = node
-        })
-        this.length = elements.length
+    if (selector) { // se pasó algo, veamos que es...
+      let elements
+      context = context || document
+      if (typeof selector === 'string') { // ... un selector CSS
+        elements = context.querySelectorAll(selector.trim())
+      } else { // ... un nodo iterable
+        elements = (NodeList.prototype.isPrototypeOf(selector) || HTMLCollection.prototype.isPrototypeOf(selector)) ? selector : [selector]
       }
+      const _this = this
+      Array.prototype.forEach.call(elements, function (node, index) {
+        _this[index] = node
+      })
+      this.length = elements.length
     }
   }
 
@@ -136,7 +129,16 @@
 
   // Export jQuery
   window.$ = window.jQuery = function (selector, context) {
-    return (Object.prototype.toString.call(selector) === '[object Object]') ? new jQueryObj(selector) : new jQuery(selector, context)
+    let retorno;
+    if (selector instanceof jQuery) {
+      retorno = Object.create(selector)
+      Object.keys(selector).forEach(function (keyName) {
+        retorno[keyName] = selector[keyName]
+      })
+    } else {
+      retorno = (Object.prototype.toString.call(selector).toLowerCase() === '[object object]') ? new jQueryObj(selector) : new jQuery(selector, context)
+    }
+    return retorno;
   }
 
 }(document, window));  
