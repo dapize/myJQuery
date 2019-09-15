@@ -2,7 +2,7 @@
   // Data
   const data = new Map()
 
-  // funcions utils
+  // #region Utils Functions
   const fn = Object.create(null)
 
   fn.random = Object.create(null)
@@ -33,8 +33,9 @@
     div.innerHTML = domString
     return div.childNodes
   }
+  // #endregion utils
 
-  // Jquery Obj
+  // #region jQuery Obj
   function jQueryObj (obj) {
     this[0] = obj
     this.length = 1
@@ -104,22 +105,32 @@
     obj[keyName] = value
     return obj
   }
+  // #endregion jQuery Obj
 
   // Jquery Nodes
   function jQuery (selector, context) {
     if (selector) { // se pasó algo, veamos que es...
       let elements
       context = context || document
-      if (typeof selector === 'string') { // ... un selector CSS o un DOM String
-        elements = (fn.string.isDomString(selector)) ? fn.string.toNode(selector) : context.querySelectorAll(selector.trim())
-      } else { // ... un nodo iterable
-        elements = (NodeList.prototype.isPrototypeOf(selector) || HTMLCollection.prototype.isPrototypeOf(selector)) ? selector : [selector]
+      switch (typeof selector) {
+        case 'string': // ... un selector CSS o un DOM String
+          elements = (fn.string.isDomString(selector)) ? fn.string.toNode(selector) : context.querySelectorAll(selector.trim())
+          break;
+
+        case 'function':
+          document.addEventListener('DOMContentLoaded', selector)
+          break;
+
+        default: 
+          elements = (NodeList.prototype.isPrototypeOf(selector) || HTMLCollection.prototype.isPrototypeOf(selector)) ? selector : [selector]
       }
-      const _this = this
-      Array.prototype.forEach.call(elements, function (node, index) {
-        _this[index] = node
-      })
-      this.length = elements.length
+      if (elements) {
+        const _this = this
+        Array.prototype.forEach.call(elements, function (node, index) {
+          _this[index] = node
+        })
+        this.length = elements.length
+      }
     }
   }
 
@@ -143,6 +154,10 @@
       cb.call(this[i], i, this[i])
       i++
     }
+  }
+
+  jQproto.ready = function (cb) {
+    if (this[0] instanceof HTMLDocument) document.addEventListener('DOMContentLoaded', cb)
   }
 
   // Export jQuery
