@@ -107,14 +107,28 @@
   }
   // #endregion jQuery Obj
 
-  // Jquery Nodes
+  // jQuery Utils
+  const _find = function (selector, jqObj) {
+    let i = 0
+    while(i < jqObj.length) {
+      jqObj[i].querySelectorAll(selector)
+      i++
+    }
+  }
+
+  // jQuery Nodes
   function jQuery (selector, context) {
     if (selector) { // se pasó algo, veamos que es...
       let elements
       context = context || document
       switch (typeof selector) {
         case 'string': // ... un selector CSS o un DOM String
-          elements = (fn.string.isDomString(selector)) ? fn.string.toNode(selector) : context.querySelectorAll(selector.trim())
+          selector = selector.trim()
+          if (fn.string.isDomString(selector)) {
+            elements = fn.string.toNode(selector)
+          } else {
+            elements = (context instanceof arguments.callee) ? _find(selector, context) : context.querySelectorAll(selector);
+          }
           break;
 
         case 'function':
