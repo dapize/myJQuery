@@ -33,6 +33,38 @@
     div.innerHTML = domString
     return div.childNodes
   }
+
+  fn.iteration = Object.create(null)
+  fn.iteration.for = function (fnName, elements, cb) {
+    return Array.prototype[fnName].call(elements, function (element) {
+      cb(element)
+    })
+  }
+
+
+  fn.jQuery = Object.create(null)
+  fn.jQuery.each = function (_this, cb) {
+    let i = 0
+    while(i < _this.length) {
+      cb.call(_this[i], i, _this[i])
+      i++
+    }
+    return _this
+  }
+  fn.jQuery.find = function (selector, obj, cb) {
+    let elements = []
+    this.each(obj, function (i, element) {
+      fn.iteration.for('forEach', element.querySelectorAll(selector), function (node) {
+        if (elements.indexOf(node) === -1) {
+          elements.push(node)
+          if (cb) cb(node)
+        }
+      })
+    })
+    return elements
+  }
+
+
   // #endregion utils
 
   // #region jQuery Obj
@@ -107,14 +139,6 @@
   }
   // #endregion jQuery Obj
 
-  // jQuery Utils
-  const _find = function (selector, jqObj) {
-    let i = 0
-    while(i < jqObj.length) {
-      jqObj[i].querySelectorAll(selector)
-      i++
-    }
-  }
 
   // jQuery Nodes
   function jQuery (selector, context) {
@@ -150,6 +174,10 @@
 
   const jQproto = jQuery.prototype = Object.create(jQprotoObj)
 
+  jQproto.ready = function (cb) {
+    if (this[0] instanceof HTMLDocument) document.addEventListener('DOMContentLoaded', cb)
+  }
+
   jQproto.html = function (html) {
     let _this = this
     if (html) {
@@ -163,15 +191,11 @@
   }
 
   jQproto.each = function (cb) {
-    let i = 0
-    while(i < this.length) {
-      cb.call(this[i], i, this[i])
-      i++
-    }
+    return _each(this, cb)
   }
 
-  jQproto.ready = function (cb) {
-    if (this[0] instanceof HTMLDocument) document.addEventListener('DOMContentLoaded', cb)
+  jQproto.find = function (selector) {
+    return new jQuery(fn.jQuery.find(selector, this));
   }
 
   // Export jQuery
