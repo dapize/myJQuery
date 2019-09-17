@@ -41,30 +41,24 @@
     })
   }
 
-
   fn.jQuery = Object.create(null)
-  fn.jQuery.each = function (_this, cb) {
+  fn.jQuery.each = function (_this, fn) {
     let i = 0
     while(i < _this.length) {
-      cb.call(_this[i], i, _this[i])
+      fn.call(_this[i], i, _this[i])
       i++
     }
     return _this
   }
-  fn.jQuery.find = function (selector, obj, cb) {
+  fn.jQuery.find = function (selector, obj) {
     let elements = []
     this.each(obj, function (i, element) {
       fn.iteration.for('forEach', element.querySelectorAll(selector), function (node) {
-        if (elements.indexOf(node) === -1) {
-          elements.push(node)
-          if (cb) cb(node)
-        }
+        if (elements.indexOf(node) === -1) elements.push(node)
       })
     })
     return elements
   }
-
-
   // #endregion utils
 
   // #region jQuery Obj
@@ -95,8 +89,12 @@
         })
       } else {
         if (data.has(element0)) {
-          valData = data.get(element0)[keyName]
-          if (!valData) valData = element0.dataset[keyName]
+          if (keyName) {
+            valData = data.get(element0)[keyName]
+            if (!valData) valData = element0.dataset[keyName]
+          } else {
+            valData = data.get(element0)
+          }
         } else {
           valData = element0.dataset[keyName]
         }
@@ -139,7 +137,6 @@
   }
   // #endregion jQuery Obj
 
-
   // jQuery Nodes
   function jQuery (selector, context) {
     if (selector) { // se pasó algo, veamos que es...
@@ -151,7 +148,7 @@
           if (fn.string.isDomString(selector)) {
             elements = fn.string.toNode(selector)
           } else {
-            elements = (context instanceof arguments.callee) ? _find(selector, context) : context.querySelectorAll(selector);
+            elements = (context instanceof arguments.callee) ? fn.jQuery.find(selector, context) : context.querySelectorAll(selector);
           }
           break;
 
@@ -159,8 +156,8 @@
           document.addEventListener('DOMContentLoaded', selector)
           break;
 
-        default: 
-          elements = (NodeList.prototype.isPrototypeOf(selector) || HTMLCollection.prototype.isPrototypeOf(selector)) ? selector : [selector]
+        default:
+          elements = selector.length ? selector : [selector]
       }
       if (elements) {
         const _this = this
@@ -191,7 +188,7 @@
   }
 
   jQproto.each = function (cb) {
-    return _each(this, cb)
+    return fn.jQuery.each(this, cb)
   }
 
   jQproto.find = function (selector) {
