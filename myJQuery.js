@@ -59,6 +59,12 @@
     })
     return elements
   }
+  fn.jQuery.onReady = null
+  fn.jQuery.holdReady = false
+  fn.jQuery.ready = function (cb) {
+    this.holdReady ? this.onReady = cb : document.addEventListener('DOMContentLoaded', cb)
+  }
+  
   // #endregion utils
 
   // #region jQuery Obj
@@ -153,7 +159,7 @@
           break;
 
         case 'function':
-          document.addEventListener('DOMContentLoaded', selector)
+          fn.jQuery.ready(selector)
           break;
 
         default:
@@ -172,7 +178,7 @@
   const jQproto = jQuery.prototype = Object.create(jQprotoObj)
 
   jQproto.ready = function (cb) {
-    if (this[0] instanceof HTMLDocument) document.addEventListener('DOMContentLoaded', cb)
+    if (this[0] instanceof HTMLDocument) fn.jQuery.ready(cb)
   }
 
   jQproto.html = function (html) {
@@ -207,6 +213,14 @@
       retorno = fn.obj.isLiteral(selector) ? new jQueryObj(selector) : new jQuery(selector, context)
     }
     return retorno
+  }
+
+  window.jQuery.holdReady = function (status) {
+    if (status) {
+      fn.jQuery.holdReady = status
+    } else {
+      if (fn.jQuery.onReady) fn.jQuery.onReady()
+    }
   }
 
 }(document, window))
