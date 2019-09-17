@@ -202,7 +202,7 @@
   }
 
   // Export jQuery
-  window.$ = window.jQuery = function (selector, context) {
+  window.jQuery = function (selector, context) {
     let retorno
     if (selector instanceof jQuery) {
       retorno = Object.create(selector)
@@ -215,12 +215,21 @@
     return retorno
   }
 
+  let $Bk;
+  if (window.$ !== undefined) $Bk = $;
+  window.$ = window.jQuery
+
   window.jQuery.holdReady = function (status) {
     if (status) {
       fn.jQuery.holdReady = status
     } else {
       if (fn.jQuery.onReady) fn.jQuery.onReady()
     }
+  }
+
+  window.jQuery.noConflict = function () {
+    if ($Bk !== undefined) window.$ = $Bk
+    return window.jQuery
   }
 
 }(document, window))
