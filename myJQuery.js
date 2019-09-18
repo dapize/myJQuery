@@ -42,10 +42,11 @@
   }
 
   fn.jQuery = Object.create(null)
-  fn.jQuery.each = function (_this, fn) {
-    let i = 0
+  fn.jQuery.each = function (_this, cb) {
+    let i = 0, cbReturn
     while(i < _this.length) {
-      fn.call(_this[i], i, _this[i])
+      cbReturn = cb.call(_this[i], i, _this[i])
+      if (cbReturn !== undefined && !cbReturn) break
       i++
     }
     return _this
@@ -220,7 +221,9 @@
   if (window.$ !== undefined) $Bk = $;
   window.$ = window.jQuery
 
-  window.jQuery.holdReady = function (status) {
+  wjQuery = window.jQuery
+
+  wjQuery.holdReady = function (status) {
     if (status) {
       fn.jQuery.holdReady = status
     } else {
@@ -228,9 +231,23 @@
     }
   }
 
-  window.jQuery.noConflict = function () {
+  wjQuery.noConflict = function () {
     if ($Bk !== undefined) window.$ = $Bk
-    return window.jQuery
+    return wjQuery
   }
 
+  wjQuery.each = function (arrObj, cb) {
+    let cbReturn
+    for (var item in arrObj) {
+      cbReturn = cb.call(arrObj[item], item, arrObj[item])
+      if (cbReturn !== undefined) {
+        if (cbReturn) {
+          continue
+        } else {
+          break
+        }
+      }
+    }
+    return arrObj
+  }
 }(document, window))
