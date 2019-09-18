@@ -75,7 +75,7 @@
 
   const jQprotoObj = jQueryObj.prototype
 
-  jQprotoObj.jquery = '3.0.0',
+  jQprotoObj.jquery = '3.1.0',
 
   jQprotoObj.data = function (keyName, value) {
     const element0 = this[0]
@@ -184,8 +184,9 @@
   jQproto.html = function (html) {
     let _this = this
     if (html) {
-      this.each(function (element) {
-        element.innerHTML = html
+      if (typeof html === 'function') html = html()
+      this.each(function () {
+        this.innerHTML = html
       })
     } else {
       _this = this[0].innerHTML
