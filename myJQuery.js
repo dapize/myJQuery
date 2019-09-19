@@ -8,7 +8,7 @@
   fn.random = Object.create(null)
   fn.random.number = function (length) {
     let result = ''
-    let init = 1;
+    let init = 1
     while (init <= length) {
       result += Math.floor((Math.random() * 9))
       init++
@@ -51,15 +51,26 @@
     }
     return _this
   }
-  fn.jQuery.find = function (selector, obj) {
-    let elements = []
-    this.each(obj, function (i, element) {
-      fn.iteration.for('forEach', element.querySelectorAll(selector), function (node) {
-        if (elements.indexOf(node) === -1) elements.push(node)
-      })
+
+  fn.jQuery.find = Object.create(null)
+  fn.jQuery.find.selector = function (elements, element, selector) {
+    fn.iteration.for('forEach', element.querySelectorAll(selector), function (node) {
+      if (elements.indexOf(node) === -1) elements.push(node)
+    })
+  }
+  fn.jQuery.find.obj = function (elements, element, obj) {
+    fn.jQuery.each(obj, function () {
+      if (element.contains(this) && elements.indexOf(this) === -1) elements.push(this)
+    })
+  }
+  fn.jQuery.find.core = function (selector, obj) {
+    const find = (selector instanceof jQuery) ? this.obj : this.selector, elements = []
+    fn.jQuery.each(obj, function () {
+      find(elements, this, selector)
     })
     return elements
   }
+
   fn.jQuery.onReady = null
   fn.jQuery.holdReady = false
   fn.jQuery.ready = function (cb) {
@@ -155,13 +166,13 @@
           if (fn.string.isDomString(selector)) {
             elements = fn.string.toNode(selector)
           } else {
-            elements = (context instanceof arguments.callee) ? fn.jQuery.find(selector, context) : context.querySelectorAll(selector);
+            elements = (context instanceof arguments.callee) ? fn.jQuery.find(selector, context) : context.querySelectorAll(selector)
           }
-          break;
+          break
 
         case 'function':
           fn.jQuery.ready(selector)
-          break;
+          break
 
         default:
           elements = selector.length ? selector : [selector]
@@ -200,7 +211,7 @@
   }
 
   jQproto.find = function (selector) {
-    return new jQuery(fn.jQuery.find(selector, this));
+    return new jQuery(fn.jQuery.find.core(selector, this))
   }
 
   // Export jQuery
@@ -217,13 +228,19 @@
     return retorno
   }
 
-  let $Bk;
-  if (window.$ !== undefined) $Bk = $;
+  let $Bk
+  if (window.$ !== undefined) $Bk = $
   window.$ = window.jQuery
 
+<<<<<<< Updated upstream
   wjQuery = window.jQuery
 
   wjQuery.holdReady = function (status) {
+=======
+  const wjq = window.jQuery
+
+  wjq.holdReady = function (status) {
+>>>>>>> Stashed changes
     if (status) {
       fn.jQuery.holdReady = status
     } else {
@@ -231,12 +248,21 @@
     }
   }
 
+<<<<<<< Updated upstream
   wjQuery.noConflict = function () {
     if ($Bk !== undefined) window.$ = $Bk
     return wjQuery
   }
 
   wjQuery.each = function (arrObj, cb) {
+=======
+  wjq.noConflict = function () {
+    if ($Bk !== undefined) window.$ = $Bk
+    return wjq
+  }
+
+  wjq.each = function (arrObj, cb) {
+>>>>>>> Stashed changes
     let cbReturn
     for (var item in arrObj) {
       cbReturn = cb.call(arrObj[item], item, arrObj[item])
