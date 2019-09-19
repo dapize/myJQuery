@@ -232,15 +232,9 @@
   if (window.$ !== undefined) $Bk = $
   window.$ = window.jQuery
 
-<<<<<<< Updated upstream
-  wjQuery = window.jQuery
-
-  wjQuery.holdReady = function (status) {
-=======
   const wjq = window.jQuery
 
   wjq.holdReady = function (status) {
->>>>>>> Stashed changes
     if (status) {
       fn.jQuery.holdReady = status
     } else {
@@ -248,21 +242,12 @@
     }
   }
 
-<<<<<<< Updated upstream
-  wjQuery.noConflict = function () {
-    if ($Bk !== undefined) window.$ = $Bk
-    return wjQuery
-  }
-
-  wjQuery.each = function (arrObj, cb) {
-=======
   wjq.noConflict = function () {
     if ($Bk !== undefined) window.$ = $Bk
     return wjq
   }
 
   wjq.each = function (arrObj, cb) {
->>>>>>> Stashed changes
     let cbReturn
     for (var item in arrObj) {
       cbReturn = cb.call(arrObj[item], item, arrObj[item])
