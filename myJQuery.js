@@ -1,4 +1,22 @@
 (function (document, window) {
+  // Polyfill
+  (function () {
+    if (!Object.prototype.assign) {
+      Object.prototype.assign = function () {
+        const target = arguments[0], nArgs = arguments.length
+        let i = 1, obj
+        while(i < nArgs) {
+          obj = arguments[i]
+          Object.keys(obj).forEach(function (keyName) {
+            target[keyName] = obj[keyName]
+          })
+          i++
+        }
+        return target
+      }
+    }
+  }())
+
   // Data
   const data = new Map()
 
