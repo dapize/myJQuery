@@ -33,6 +33,12 @@
     div.innerHTML = domString
     return div.childNodes
   }
+  fn.string.lowerCamelCase = function (txt, separator) {
+    separator = separator || ' '
+    return txt.split(separator).map(function (text, i) {
+      return i ? text.substring(0, 1).toUpperCase() + text.substring(1) : text
+    }).join('')
+  }
 
   fn.iteration = Object.create(null)
   fn.iteration.for = function (fnName, elements, cb) {
@@ -71,6 +77,21 @@
     return elements
   }
 
+  fn.jQuery.data = function (keyName, value, isObj) {
+    let objSet, hasData
+    this.each(function (i, element) {
+      hasData = data.has(element)
+      if (isObj) {
+        objSet = Object.assign(hasData ? data.get(element) : Object.create(null), keyName)
+      } else {
+        objSet = Object.create(null)
+        objSet[keyName] = value
+        if (hasData) objSet = Object.assign(data.get(element), objSet)
+      }
+      data.set(element, objSet)
+    })
+  }
+
   fn.jQuery.onReady = null
   fn.jQuery.holdReady = false
   fn.jQuery.ready = function (cb) {
@@ -92,55 +113,61 @@
   jQprotoObj.data = function (keyName, value) {
     const element0 = this[0]
     let valData
-    if (Element.prototype.isPrototypeOf(element0)) {
-      if (value) {
-        valData = this 
-        let objSet
-        this.each(function (index, element) {
-          if (data.has(element)) {
-            data.get(element)[keyName] = value
-          } else {
-            objSet = Object.create(null)
-            objSet[keyName] = value
-            data.set(element, objSet)
-          }
-        })
+    const isObj = fn.obj.isLiteral(keyName)
+    if (keyName) {
+      if (isObj) {
+        let keyNameClean = Object.create(null)
+        for (var element in keyName) {
+          (element.indexOf('-') !== -1) ? keyNameClean[fn.string.lowerCamelCase(element, '-')] = keyName[element] : keyNameClean[element] = keyName[element]
+        }
+        keyName = keyNameClean
       } else {
-        if (data.has(element0)) {
-          if (keyName) {
-            valData = data.get(element0)[keyName]
-            if (!valData) valData = element0.dataset[keyName]
-          } else {
-            valData = data.get(element0)
-          }
+        if (keyName.indexOf('-') !== -1) keyName = fn.string.lowerCamelCase(keyName, '-')
+      }
+    }
+    if (Element.prototype.isPrototypeOf(element0)) {
+      if (keyName === undefined && value === undefined) {
+        valData = data.has(element0) ? data.get(element0) : Object.create(null)
+      } else {
+        valData = this
+        if (value) {
+          fn.jQuery.data.call(this, keyName, value, isObj)
         } else {
-          valData = element0.dataset[keyName]
+          if (isObj) {
+            fn.jQuery.data.call(this, keyName, value, isObj)
+          } else {
+            if (data.has(element0)) {
+              valData = data.get(element0)[keyName]
+              if (valData === undefined) valData = element0.dataset[keyName]
+            } else {
+              valData = element0.dataset[keyName]
+            }
+          }
         }
       }
     } else {
       const preNameProp = 'jQuery' + this.jquery.split('.').join('')
-      const suffNumber = fn.random.number(18)
       const filter = Object.keys(element0).filter(function (name) {
         return name.indexOf(preNameProp) >= 0
       })
+      if (!filter.length) {
+        const suffNumber = fn.random.number(18)
+        const objEmpty = Object.create(null)
+        element0[preNameProp + suffNumber] = objEmpty
+        filter[0] = preNameProp + suffNumber
+      }
       if (!keyName && !value) {
-        if (filter.length) {
-          valData = filter[0]
-        } else {
-          const objEmpty = Object.create(null)
-          element0[preNameProp + suffNumber] = objEmpty
-          valData = objEmpty
-        }
+        valData = element0[filter[0]]
       } else {
+        valData = this
         if (value) {
-          valData = this
-          if (filter.length) {
           element0[filter[0]][keyName] = value
-          } else {
-          element0[preNameProp + suffNumber] = value
-          }
         } else {
-          valData = (filter.length) ? element0[filter[0]][keyName] : undefined
+          if (isObj) {
+            element0[filter[0]] = Object.assign(element0[filter[0]], keyName)
+          } else {
+            valData = element0[filter[0]][keyName]
+          }
         }
       }
     }
