@@ -306,4 +306,16 @@
     }
     return arrObj
   }
+
+  wjq.data = function (element, key, value) {
+    const nodeJq = new jQuery(element)
+    nodeJq.data(key, value)
+    let retorno
+    if (value !== undefined) {
+      retorno = nodeJq.data(key)
+    } else {
+      retorno = fn.obj.isLiteral(key) ? nodeJq.data() : nodeJq.data(key)
+    }
+    return retorno
+  }
 }(document, window))
