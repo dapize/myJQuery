@@ -1,0 +1,24 @@
+{
+  "name": "myJQuery",
+  "version": "1.0.0",
+  "description": "Mi propio jQuery :)",
+  "main": "myJQuery.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tests": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dapize/myJQuery.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dapize/myJQuery/issues"
+  },
+  "homepage": "https://github.com/dapize/myJQuery#readme",
+  "devDependencies": {
+    "jest": "^24.9.0"
+  }
+}
