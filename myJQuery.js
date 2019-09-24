@@ -1,19 +1,23 @@
 (function (document, window) {
   // Polyfill
   (function () {
-    if (!Object.prototype.assign) {
-      Object.prototype.assign = function () {
-        const target = arguments[0], nArgs = arguments.length
-        let i = 1, obj
-        while(i < nArgs) {
-          obj = arguments[i]
-          Object.keys(obj).forEach(function (keyName) {
-            target[keyName] = obj[keyName]
-          })
-          i++
-        }
-        return target
-      }
+    if (typeof Object.assign !== 'function') {
+      Object.defineProperty(Object, 'assign', {
+        value: function () {
+          const target = arguments[0], nArgs = arguments.length
+          let i = 1, obj
+          while(i < nArgs) {
+            obj = arguments[i]
+            Object.keys(obj).forEach(function (keyName) {
+              target[keyName] = obj[keyName]
+            })
+            i++
+          }
+          return target
+        },
+        writable: true,
+        configurable: true
+      })
     }
   }())
 
@@ -310,12 +314,6 @@
   wjq.data = function (element, key, value) {
     const nodeJq = new jQuery(element)
     nodeJq.data(key, value)
-    let retorno
-    if (value !== undefined) {
-      retorno = nodeJq.data(key)
-    } else {
-      retorno = fn.obj.isLiteral(key) ? nodeJq.data() : nodeJq.data(key)
-    }
-    return retorno
+    return fn.obj.isLiteral(key) ? key : value !== undefined ? value : nodeJq.data(key)
   }
 }(document, window))
