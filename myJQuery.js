@@ -202,6 +202,8 @@
     obj[keyName] = value
     return obj
   }
+
+  jQprotoObj.length = 0
   // #endregion jQuery Obj
 
   // jQuery Nodes
@@ -237,8 +239,6 @@
   }
 
   const jQproto = jQuery.prototype = Object.create(jQprotoObj)
-
-  jQproto.length = 0
 
   jQproto.ready = function (cb) {
     if (this[0] instanceof HTMLDocument) fn.jQuery.ready(cb)
