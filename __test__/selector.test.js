@@ -32,6 +32,38 @@ describe('Selector', () => {
     expect(ul[0]).toEqual(ulNode);
   });
 
+  test('With Context', () => {
+    document.body.innerHTML = `
+      <main>
+        <section class="principal">
+          <div class="item">item 1</div>
+          <div class="item item-2">item 2</div>
+          <div class="item">item 3</div>
+        </section>
+        <article id="secondary">
+          <div class="item">item outside 1</div>
+          <div class="item item-2">item outside 1</div>
+        </article>
+      </main>
+    `;
+    const section = document.querySelector('section');
+    const divs = section.querySelectorAll('div');
+
+    const $divs = $('div', section); // by tag with context node
+    const $items = $('.item', section); // by class with context node
+    divs.forEach( (div, index) => {
+      expect($divs[index]).toEqual(div);
+      expect($items[index]).toEqual(div);
+    });
+
+    expect($divs.length).toBe(3);
+    expect($divs).toEqual({0: divs[0], 1: divs[1], 2: divs[2], length: 3});
+
+    expect($items.length).toBe(3);
+    expect($items).toEqual({0: divs[0], 1: divs[1], 2: divs[2], length: 3});
+  
+  });
+
   test('Class Name (unic node)', () => {
     document.body.innerHTML = '<div class="wrapper"></div>'
     const wrapper = document.querySelector('.wrapper');
