@@ -53,7 +53,4 @@ describe('Selector', () => {
     const $container = $('#container');
     expect($container).toEqual({0: container, length: 1});
   });
-
-  
-
 })
