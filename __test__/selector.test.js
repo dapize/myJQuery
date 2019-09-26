@@ -1,4 +1,4 @@
-require('../myJQuery');
+const $ = require('../jQuery-library');
 
 describe('Selector', () => {
 
@@ -32,38 +32,6 @@ describe('Selector', () => {
     expect(ul[0]).toEqual(ulNode);
   });
 
-  test('With Context', () => {
-    document.body.innerHTML = `
-      <main>
-        <section class="principal">
-          <div class="item">item 1</div>
-          <div class="item item-2">item 2</div>
-          <div class="item">item 3</div>
-        </section>
-        <article id="secondary">
-          <div class="item">item outside 1</div>
-          <div class="item item-2">item outside 1</div>
-        </article>
-      </main>
-    `;
-    const section = document.querySelector('section');
-    const divs = section.querySelectorAll('div');
-
-    const $divs = $('div', section); // by tag with context node
-    const $items = $('.item', section); // by class with context node
-    divs.forEach( (div, index) => {
-      expect($divs[index]).toEqual(div);
-      expect($items[index]).toEqual(div);
-    });
-
-    expect($divs.length).toBe(3);
-    expect($divs).toEqual({0: divs[0], 1: divs[1], 2: divs[2], length: 3});
-
-    expect($items.length).toBe(3);
-    expect($items).toEqual({0: divs[0], 1: divs[1], 2: divs[2], length: 3});
-  
-  });
-
   test('Class Name (unic node)', () => {
     document.body.innerHTML = '<div class="wrapper"></div>'
     const wrapper = document.querySelector('.wrapper');
@@ -79,10 +47,57 @@ describe('Selector', () => {
     expect($item).toEqual({0: item[0], 1: item[1], 2: item[2], length: 3});
   });
 
+  test('Tag and Class Name With Context', () => {
+    document.body.innerHTML = `
+      <main>
+        <section class="principal block">
+          <div class="item">item 1</div>
+          <div class="item item-2">item 2</div>
+          <div class="item item-3">item 3</div>
+        </section>
+        <article id="secondary" class="block">
+          <div class="item">item outside 1</div>
+          <div class="item item-2">item outside 1</div>
+        </article>
+      </main>
+    `;
+    const section = document.querySelector('section');
+    const divs = section.querySelectorAll('div');
+
+    const $divs = $('div', section); // by tag with context node
+    const $items = $('.item', section); // by class with context node
+    divs.forEach( (div, index) => {
+      expect($divs[index]).toEqual(div);
+      expect($items[index]).toEqual(div);
+    });
+    expect($divs.length).toBe(3);
+    expect($divs).toEqual({0: divs[0], 1: divs[1], 2: divs[2], length: 3});
+    expect($items.length).toBe(3);
+    expect($items).toEqual({0: divs[0], 1: divs[1], 2: divs[2], length: 3});
+
+    const $main = $('main');
+    const $blocks = $('.block');
+    const $item2 = $('.item-2', $main); // by class with context node jQuery
+    const $item2b = $('.item-2', $blocks);
+    const item2 = document.querySelectorAll('.item-2');
+    expect($item2.length).toBe(2);
+    const objReturn = {0: item2[0], 1: item2[1], length: 2};
+    expect($item2).toEqual(objReturn);
+    expect($item2b).toEqual(objReturn);
+
+    const sectionPrincipal = document.querySelector('.principal');
+    const item3 = document.querySelector('.item-3');
+    const $item3 = $(item3, sectionPrincipal);
+    expect($item3.length).toBe(1);
+    expect($item3).toEqual({0: item3, length: 1});
+  });
+
   test('ID', () => {
     document.body.innerHTML = '<div id="container"></div>'
     const container = document.getElementById('container');
     const $container = $('#container');
     expect($container).toEqual({0: container, length: 1});
+    const $container2 = $('#container2');
+    expect($container2.length).toBe(0);
   });
 })

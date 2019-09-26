@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/dapize/myJQuery#readme",
   "devDependencies": {
-    "jest": "^24.9.0"
+    "jest": "^24.9.0",
+    "jquery": "^3.4.1"
   }
 }

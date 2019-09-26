@@ -217,7 +217,7 @@
           if (fn.string.isDomString(selector)) {
             elements = fn.string.toNode(selector)
           } else {
-            elements = (context instanceof arguments.callee) ? fn.jQuery.find(selector, context) : context.querySelectorAll(selector)
+            elements = (context instanceof arguments.callee) ? fn.jQuery.find.core(selector, context) : context.querySelectorAll(selector)
           }
           break
 
@@ -226,7 +226,7 @@
           break
 
         default:
-          elements = selector.length ? selector : [selector]
+          if (selector !== null || selector !== undefined) elements = selector.length ? selector : [selector]
       }
       if (elements) {
         const _this = this
@@ -265,7 +265,7 @@
     return new jQuery(fn.jQuery.find.core(selector, this))
   }
 
-  // Export jQuery
+  // Window.jQuery
   window.jQuery = function (selector, context) {
     let retorno
     if (selector instanceof jQuery) {
@@ -278,10 +278,6 @@
     }
     return retorno
   }
-
-  let $Bk
-  if (window.$ !== undefined) $Bk = $
-  window.$ = window.jQuery
 
   const wjq = window.jQuery
 
@@ -317,5 +313,14 @@
     const nodeJq = new jQuery(element)
     nodeJq.data(key, value)
     return fn.obj.isLiteral(key) ? key : value !== undefined ? value : nodeJq.data(key)
+  }
+
+  // Export jQuery
+  if (typeof module === "object" && module.exports) {
+    module.exports = window.jQuery;
+  } else {
+    let $Bk
+    if (window.$ !== undefined) $Bk = $
+    window.$ = window.jQuery
   }
 }(document, window))
