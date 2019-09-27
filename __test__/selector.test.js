@@ -28,7 +28,7 @@ describe('Selector', () => {
     document.body.innerHTML = '<ul></ul>'
     const ulNode = document.querySelector('ul');
     const ul = $('ul');
-    expect(ul).toEqual({0: ulNode, length: 1});
+    expect(ul).toEqual({0: ulNode, length: 1, prevObject: { 0: document, length: 1 }});
     expect(ul[0]).toEqual(ulNode);
   });
 
@@ -36,15 +36,15 @@ describe('Selector', () => {
     document.body.innerHTML = '<div class="wrapper"></div>'
     const wrapper = document.querySelector('.wrapper');
     const $wrapper = $('.wrapper');
-    expect($wrapper).toEqual({0: wrapper, length: 1});
+    expect($wrapper).toEqual({0: wrapper, length: 1, prevObject: { 0: document, length: 1 }});
     expect($wrapper[0]).toEqual(wrapper);
   });
 
   test('Class Name (many nodes)', () => {
     document.body.innerHTML = '<div class="item"></div><div class="item"></div><div class="item"></div>'
-    const item = document.querySelectorAll('.item');
-    const $item = $('.item');
-    expect($item).toEqual({0: item[0], 1: item[1], 2: item[2], length: 3});
+    const items = document.querySelectorAll('.item');
+    const $items = $('.item');
+    expect($items).toEqual({0: items[0], 1: items[1], 2: items[2], length: 3, prevObject: { 0: document, length: 1 }});
   });
 
   test('Tag and Class Name With Context', () => {
@@ -71,17 +71,22 @@ describe('Selector', () => {
       expect($items[index]).toEqual(div);
     });
     expect($divs.length).toBe(3);
-    expect($divs).toEqual({0: divs[0], 1: divs[1], 2: divs[2], length: 3});
+    const prevObj = {0: section, length: 1, prevObject: {0: document, length: 1}};
+    expect($divs).toEqual({0: divs[0], 1: divs[1], 2: divs[2], length: 3, prevObject: prevObj});
     expect($items.length).toBe(3);
-    expect($items).toEqual({0: divs[0], 1: divs[1], 2: divs[2], length: 3});
+    expect($items).toEqual({0: divs[0], 1: divs[1], 2: divs[2], length: 3, prevObject: prevObj});
 
+
+     // by class with context node jQuery
     const $main = $('main');
     const $blocks = $('.block');
-    const $item2 = $('.item-2', $main); // by class with context node jQuery
+    
     const $item2b = $('.item-2', $blocks);
     const item2 = document.querySelectorAll('.item-2');
-    expect($item2.length).toBe(2);
+
     const objReturn = {0: item2[0], 1: item2[1], length: 2};
+    
+    const $item2 = $('.item-2', $main);
     expect($item2).toEqual(objReturn);
     expect($item2b).toEqual(objReturn);
 
@@ -96,8 +101,23 @@ describe('Selector', () => {
     document.body.innerHTML = '<div id="container"></div>'
     const container = document.getElementById('container');
     const $container = $('#container');
-    expect($container).toEqual({0: container, length: 1});
+    expect($container).toEqual({0: container, length: 1, prevObject: { 0: document, length: 1 }});
     const $container2 = $('#container2');
     expect($container2.length).toBe(0);
+  });
+
+  test('Node DOM', () => {
+    const newDiv = document.createElement('div');
+    document.body.appendChild(newDiv);
+    const div = document.querySelector('div');
+    const $div = $(div);
+    expect($div).toEqual({0: div, length: 1, prevObject: { 0: document, length: 1 }});
+  });
+
+  test('Nodes DOM', () => {
+    document.body.innerHTML = '<div class="item"></div><div class="item"></div><div class="item"></div>'
+    const items = document.querySelectorAll('.item');
+    const $items = $(items);
+    expect($items).toEqual({0: items[0], 1: items[1], 2: items[2], length: 3, prevObject: { 0: document, length: 1 }});
   });
 })

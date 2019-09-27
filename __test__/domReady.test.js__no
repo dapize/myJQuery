@@ -1,0 +1,13 @@
+const $ = require('../jQuery-library');
+
+describe('Document Ready', () => {
+  
+  test('Function like selector', async () => {
+    const domReady = await $(document).ready(function () {
+      // DOM Ready
+    })
+    expect(domReady[0]).toEqual(document)
+    expect(domReady.length).toBe(1)
+  })
+ 
+})

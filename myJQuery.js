@@ -211,7 +211,8 @@
     if (selector) { // se pasó algo, veamos que es...
       let elements
       context = context || document
-      switch (typeof selector) {
+      const selectorType = typeof selector
+      switch (selectorType) {
         case 'string': // ... un selector CSS o un DOM String
           selector = selector.trim()
           if (fn.string.isDomString(selector)) {
@@ -221,19 +222,43 @@
           }
           break
 
-        case 'function':
+        case 'function': // el callback de listo el DOM
           fn.jQuery.ready(selector)
           break
 
-        default:
-          if (selector !== null || selector !== undefined) elements = selector.length ? selector : [selector]
+        default: // un iterable, yá sea 'Collection' o 'Array'
+          if (selector !== null || selector !== undefined) elements = selector.length !== undefined ? selector : [selector]
       }
       if (elements) {
-        const _this = this
-        Array.prototype.forEach.call(elements, function (node, index) {
-          _this[index] = node
-        })
+        if (elements.length) {
+          const _this = this
+          Array.prototype.forEach.call(elements, function (node, index) {
+            _this[index] = node
+          })
+        }
         this.length = elements.length
+
+        if (selectorType === 'string') {
+          if (selector instanceof HTMLDocument) {
+            if (context instanceof HTMLDocument) {
+
+            } else {
+              this.prevObject = new arguments.callee(context)
+            }
+          } else {
+            if (context instanceof arguments.callee) {
+              if (context[0] instanceof HTMLDocument) {
+
+              } else {
+                this.prevObject = new arguments.callee(context[0])
+              }
+            } else {
+              this.prevObject = new arguments.callee(context)
+            }
+          }
+        }
+
+        // if (prevObj) this.prevObject = new arguments.callee(prevObj)
       }
     }
   }
@@ -262,7 +287,9 @@
   }
 
   jQproto.find = function (selector) {
-    return new jQuery(fn.jQuery.find.core(selector, this))
+    const retorno = new jQuery(fn.jQuery.find.core(selector, this))
+    retorno.prevObject = this
+    return retorno
   }
 
   // Window.jQuery
@@ -317,7 +344,7 @@
 
   // Export jQuery
   if (typeof module === "object" && module.exports) {
-    module.exports = window.jQuery;
+    module.exports = window.jQuery
   } else {
     let $Bk
     if (window.$ !== undefined) $Bk = $
