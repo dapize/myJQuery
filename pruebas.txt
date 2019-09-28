@@ -1,0 +1,39 @@
+
+$('mela').find('.lgl-mtitle').find('.nada')
+// real: 0 0 0 1 (HTML Document)
+// mio: 0 0 0 1 (HTML Document)
+
+$('.lgl-main').find('.lgl-mtitle2').find('algo')
+// real: 0 0 1 1 (HTML DOCUMENT)
+// mio: 0 0 1 1 (HTML DOCUMENT)
+
+
+$('img', $('.lgl-neighborhoods')) 
+// real 4 1 1 (HTML DOCUMENT)
+// mio 4 1 1 
+
+$('img', $($0)) 
+// mio: 4 1 
+// real: 4 1 (<article class="lgl-neighborhoods lgl-mw">)
+  
+
+$('.lgl-nlist .lgl-nsblock').find('a')
+// mio: 0 0 1 (HTML Document)
+// real: 0 0 1 (HTML Document)
+
+
+
+(function (root, factory) {
+  if (typeof define === "function" && define.amd) {
+    define(["jQuery"], function(jquery){
+      return (root.jQuery = factory(jquery));
+    })
+  } else if (typeof module === "object" && module.exports) {
+    module.exports = (root.jQuery = factory(require('jquery')))
+  } else {
+    root.jQuery = factory(root.jQuery)
+  }
+} (this, function(jquery) {
+  // module code here....
+  return jQuery
+}))

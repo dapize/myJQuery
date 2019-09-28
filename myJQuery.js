@@ -40,6 +40,7 @@
 
   fn.regex = Object.create(null)
   fn.regex.tag = /<[^>]+>/g
+  fn.regex.id = /#[0-9a-zA-Z]/g
   
   fn.obj = Object.create(null)
   fn.obj.isLiteral = function (obj) {
@@ -237,28 +238,12 @@
           })
         }
         this.length = elements.length
-
-        if (selectorType === 'string') {
-          if (selector instanceof HTMLDocument) {
-            if (context instanceof HTMLDocument) {
-
-            } else {
-              this.prevObject = new arguments.callee(context)
-            }
-          } else {
-            if (context instanceof arguments.callee) {
-              if (context[0] instanceof HTMLDocument) {
-
-              } else {
-                this.prevObject = new arguments.callee(context[0])
-              }
-            } else {
-              this.prevObject = new arguments.callee(context)
-            }
-          }
+        // prevObject
+        if (selectorType === 'string' && !fn.regex.id.test(selector)) {
+          this.prevObject = new arguments.callee(context)
+        } else if (selector instanceof jQuery) {
+          if (selector.prevObject) this.prevObject = selector.prevObject
         }
-
-        // if (prevObj) this.prevObject = new arguments.callee(prevObj)
       }
     }
   }
