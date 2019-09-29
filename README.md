@@ -14,3 +14,5 @@ Aun está en desarrollo, así que iré enlistando todo lo que voy avanzando:
 			 - Con contexto: 0%
 			 - Con atributos: 0%
 		 - [Callback](https://api.jquery.com/jQuery/#jQuery3)
+ - [Data](https://api.jquery.com/category/data/)
+	 - [.data()](https://api.jquery.com/data/)
