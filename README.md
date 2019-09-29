@@ -14,6 +14,17 @@ Aun está en desarrollo, así que iré enlistando todo lo que voy avanzando:
 			 - Con contexto: 0%
 			 - Con atributos: 0%
 		 - [Callback](https://api.jquery.com/jQuery/#jQuery3)
+
  - [Data](https://api.jquery.com/category/data/)
 	 - [.data()](https://api.jquery.com/data/)
 	 - [jQuery.data()](https://api.jquery.com/jQuery.data/)
+
+ - [Manipulation](https://api.jquery.com/category/manipulation/)
+	 - [DOM Insertion, Inside](https://api.jquery.com/category/manipulation/dom-insertion-inside/)
+		 - [.html()](https://api.jquery.com/html/)
+
+ - [Miscellaneous](https://api.jquery.com/category/miscellaneous/)
+	 - [.each()](https://api.jquery.com/each/)
+
+ - [Utilities](https://api.jquery.com/category/utilities/)
+	 - [jQuery.each()](https://api.jquery.com/jQuery.each/)
