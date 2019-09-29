@@ -39,3 +39,30 @@ describe('.data()', () => {
     expect($newDataVault2).not.toBe(oldDataVault2);
   });
 })
+
+describe('$.data()', () => {
+
+  test('Setting Data', () => {
+    document.body.innerHTML = '<div id="vault1"></div>';
+    
+    const vault1 = document.getElementById('vault1');
+    const dataVault1 = 'i\'m Fine';
+    const $settingData = $.data(vault1, 'how-are-you', dataVault1);
+    expect($settingData).toBe(dataVault1);
+
+    const $dataVault1 = $.data(vault1, 'howAreYou')
+    const $dataVault1b = $.data(vault1, 'how-are-you')
+    expect($dataVault1).toBe(dataVault1);
+    expect($dataVault1b).toBe(dataVault1);
+
+    const oneObject = {item1: 'simple value'};
+    const $dataVault1c = $.data(vault1, 'one-object', oneObject)
+    expect($dataVault1c).toEqual(oneObject);
+
+    const $finalData = $.data(vault1);
+    expect($finalData).toEqual({
+      oneObject: oneObject,
+      howAreYou: dataVault1
+    });
+  });
+})

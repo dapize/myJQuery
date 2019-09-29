@@ -16,3 +16,4 @@ Aun está en desarrollo, así que iré enlistando todo lo que voy avanzando:
 		 - [Callback](https://api.jquery.com/jQuery/#jQuery3)
  - [Data](https://api.jquery.com/category/data/)
 	 - [.data()](https://api.jquery.com/data/)
+	 - [jQuery.data()](https://api.jquery.com/jQuery.data/)
