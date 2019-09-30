@@ -28,3 +28,6 @@ Aun está en desarrollo, así que iré enlistando todo lo que voy avanzando:
 
  - [Utilities](https://api.jquery.com/category/utilities/)
 	 - [jQuery.each()](https://api.jquery.com/jQuery.each/)
+ - [Traversing](https://api.jquery.com/category/traversing/)
+	 - [Tree Traversal](https://api.jquery.com/category/traversing/tree-traversal/)
+		 - [.find()](https://api.jquery.com/find/)

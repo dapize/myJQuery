@@ -87,13 +87,24 @@
       if (elements.indexOf(node) === -1) elements.push(node)
     })
   }
-  fn.jQuery.find.obj = function (elements, element, obj) {
+  fn.jQuery.find.jQuery = function (elements, element, obj) {
     fn.jQuery.each(obj, function () {
       if (element.contains(this) && elements.indexOf(this) === -1) elements.push(this)
     })
   }
+  fn.jQuery.find.node = function (elements, element, node) {
+    if (element.contains(node) && elements.indexOf(node) === -1) elements.push(node)
+  }
   fn.jQuery.find.core = function (selector, obj) {
-    const find = (selector instanceof jQuery) ? this.obj : this.selector, elements = []
+    let find
+    const elements = []
+    if (typeof selector === 'string') {
+      find = this.selector
+    } else if (selector instanceof jQuery) {
+      find = this.jQuery
+    } else {
+      find = this.node
+    }
     fn.jQuery.each(obj, function () {
       find(elements, this, selector)
     })
