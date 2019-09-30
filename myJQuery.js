@@ -218,10 +218,22 @@
   }
 
   jQprotoObj.prop = function (keyName, value) {
-    const obj = this[0]
-    if (value === undefined) return obj[keyName]
-    obj[keyName] = value
-    return obj
+    const element0 = this[0]
+    let retorno
+    if (Element.prototype.isPrototypeOf(element0)) {
+      if (value === undefined) {
+        retorno = element0[keyName]
+      } else {
+        this.each(function (index, item) {
+          item[keyName] = typeof value === 'function' ? value(index, item[keyName]) : value
+        })
+      }
+    } else {
+      if (value === undefined) return element0[keyName]
+      element0[keyName] = value
+      retorno = element0
+    }
+    return retorno
   }
 
   jQprotoObj.removeData = function (keyName) {
