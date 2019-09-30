@@ -111,7 +111,18 @@
     return elements
   }
 
-  fn.jQuery.data = function (keyName, value, isObj) {
+  fn.jQuery.data = Object.create(null)
+  fn.jQuery.data.name = function () {
+    return 'jQuery' + jQueryObj.prototype.jquery.split('.').join('')
+  }
+  fn.jQuery.data.obj = function (element) {
+    const preNameProp = this.name()
+    const filter = Object.keys(element).filter(function (name) {
+      return name.indexOf(preNameProp) >= 0
+    })
+    return filter.length ? filter[0] : false
+  }
+  fn.jQuery.data.set = function (keyName, value, isObj) {
     let objSet, hasData
     this.each(function (i, element) {
       hasData = data.has(element)
@@ -165,10 +176,10 @@
       } else {
         valData = this
         if (value) {
-          fn.jQuery.data.call(this, keyName, value, isObj)
+          fn.jQuery.data.set.call(this, keyName, value, isObj)
         } else {
           if (isObj) {
-            fn.jQuery.data.call(this, keyName, value, isObj)
+            fn.jQuery.data.set.call(this, keyName, value, isObj)
           } else {
             if (data.has(element0)) {
               valData = data.get(element0)[keyName]
@@ -180,27 +191,25 @@
         }
       }
     } else {
-      const preNameProp = 'jQuery' + this.jquery.split('.').join('')
-      const filter = Object.keys(element0).filter(function (name) {
-        return name.indexOf(preNameProp) >= 0
-      })
-      if (!filter.length) {
+      let nameObjData = fn.jQuery.data.obj(element0)
+      if (!nameObjData) {
         const suffNumber = fn.random.number(18)
         const objEmpty = Object.create(null)
+        const preNameProp = fn.jQuery.data.name()
         element0[preNameProp + suffNumber] = objEmpty
-        filter[0] = preNameProp + suffNumber
+        nameObjData = preNameProp + suffNumber
       }
       if (!keyName && !value) {
-        valData = element0[filter[0]]
+        valData = element0[nameObjData]
       } else {
         valData = this
         if (value) {
-          element0[filter[0]][keyName] = value
+          element0[nameObjData][keyName] = value
         } else {
           if (isObj) {
-            element0[filter[0]] = Object.assign(element0[filter[0]], keyName)
+            element0[nameObjData] = Object.assign(element0[nameObjData], keyName)
           } else {
-            valData = element0[filter[0]][keyName]
+            valData = element0[nameObjData][keyName]
           }
         }
       }
@@ -213,6 +222,29 @@
     if (value === undefined) return obj[keyName]
     obj[keyName] = value
     return obj
+  }
+
+  jQprotoObj.removeData = function (keyName) {
+    const objData = fn.jQuery.data.obj(this)
+    if (objData) {
+      delete (keyName === undefined ? this[objData] : this[objData][keyName])
+    } else {
+      let getData
+      this.each(function () {
+        if (keyName === undefined) {
+          data.set(this, Object.create(null))
+        } else {
+          if (data.has(this)) {
+            if (!Array.isArray(keyName)) keyName = keyName.split(' ')
+            getData = data.get(this)
+            keyName.forEach(function (name) {
+              delete getData[name]
+            })
+          }
+        }
+      })
+    }
+    return this
   }
 
   jQprotoObj.length = 0

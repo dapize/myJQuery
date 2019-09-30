@@ -2,7 +2,7 @@ const $ = require('../jQuery-library');
 
 describe('.data()', () => {
 
-  test('Setting Data', () => {
+  test('Setting Data string in a Node', () => {
     document.body.innerHTML = '<div id="vault1"></div>';
     
     const vault1 = document.getElementById('vault1');
@@ -14,7 +14,16 @@ describe('.data()', () => {
     expect($dataVault1b).toBe(dataVault1);
   });
 
-  test('Getting Data with large name', () => {
+  test('Setting Data object in a Node', () => {
+    document.body.innerHTML = '<div id="vault1"></div>';
+    const $vault1 = $('#vault1');
+    const objData = { first: 'data 1', second: 'data 2', third: 'data 3'};
+    $vault1.data(objData);
+    const $dataVault1 = $vault1.data();
+    expect($dataVault1).toEqual(objData);
+  })
+
+  test('Getting Data with large name in a Node', () => {
     document.body.innerHTML = '<div id="vault3" data-perfect-code="myJQuery"></div>';
 
     const vault3 = document.getElementById('vault3');
@@ -24,7 +33,7 @@ describe('.data()', () => {
     expect($dataVault3b).toBe('myJQuery');
   }) 
 
-  test('Getting Data with attribute and jQuery Data', () => {
+  test('Getting Data with attribute and jQuery Data in a Node', () => {
     document.body.innerHTML = '<div id="vault2" data-content="secret-code"></div>';
   
     const vault2 = document.getElementById('vault2');
@@ -38,6 +47,28 @@ describe('.data()', () => {
     expect($newDataVault2).toBe(newDataVault2);
     expect($newDataVault2).not.toBe(oldDataVault2);
   });
+
+  test('Removing Data in a Node', () => {
+    document.body.innerHTML = '<div></div>';
+    const $div = $('div');
+    $div.data('first', 'word');
+    $div.data('second', 'place');
+    const $divData = $div.data();
+    expect($divData).toEqual({first: 'word', second: 'place'});
+
+    $div.removeData('second')
+    expect($div.data()).toEqual({first: 'word'});
+
+    $div.removeData()
+    expect($div.data()).toEqual(Object.create(null));
+  })
+
+  test('Setting Data Object', () => {
+    const objData = { first: 'data 1', second: 'data 2', third: 'data 3' };
+    const objJquery = $({one: 'item'});
+    objJquery.data(objData);
+    expect(objJquery.data()).toEqual(objData);
+  })
 })
 
 describe('$.data()', () => {
