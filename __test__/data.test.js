@@ -73,7 +73,7 @@ describe('.data()', () => {
 
 describe('$.data()', () => {
 
-  test('Setting Data', () => {
+  test('Setting Data string', () => {
     document.body.innerHTML = '<div id="vault1"></div>';
     
     const vault1 = document.getElementById('vault1');
@@ -96,4 +96,28 @@ describe('$.data()', () => {
       howAreYou: dataVault1
     });
   });
+
+  test('Setting Data Object', () => {
+    document.body.innerHTML = '<div></div>';
+    const objData = { first: 'data 1', second: 'data 2', third: 'data 3' };
+    const div = document.querySelector('div');
+    $.data(div, objData);
+    expect($.data(div)).toEqual(objData);
+  })
+
+  test('Removing Data string', () => {
+    document.body.innerHTML = '<div></div>';
+    const div = document.querySelector('div');
+    const objData = { first: 'data 1', second: 'data 2', third: 'data 3' };
+    $.data(div, objData);
+
+    const secondData = $.data(div, 'second');
+    expect(secondData).toBe('data 2');
+
+    $.removeData(div, 'first');
+    expect($.data(div)).toEqual({second: 'data 2', third: 'data 3'})
+
+    $.removeData(div);
+    expect($.data(div)).toEqual(Object.create(null));
+  })
 })

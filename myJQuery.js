@@ -370,6 +370,11 @@
     return fn.obj.isLiteral(key) ? key : value !== undefined ? value : nodeJq.data(key)
   }
 
+  wjq.removeData = function (element, key) {
+    const nodeJq = new jQuery(element)
+    nodeJq.removeData(key)
+  }
+
   // Export jQuery
   if (typeof module === "object" && module.exports) {
     module.exports = window.jQuery
