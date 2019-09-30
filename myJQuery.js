@@ -375,6 +375,10 @@
     nodeJq.removeData(key)
   }
 
+  wjq.hasData = function (element) {
+    return data.has(element)
+  }
+
   // Export jQuery
   if (typeof module === "object" && module.exports) {
     module.exports = window.jQuery

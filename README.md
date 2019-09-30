@@ -20,6 +20,7 @@ Aun está en desarrollo, así que iré enlistando todo lo que voy avanzando:
 	 - [.removeData()](https://api.jquery.com/removeData/)
 	 - [jQuery.data()](https://api.jquery.com/jQuery.data/)
 	 - [jQuery.removeData()](https://api.jquery.com/jQuery.removeData/)
+	 - [jQuery.hasData()](https://api.jquery.com/jQuery.hasData/)
 
  - [Manipulation](https://api.jquery.com/category/manipulation/)
 	 - [DOM Insertion, Inside](https://api.jquery.com/category/manipulation/dom-insertion-inside/)

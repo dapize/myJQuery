@@ -103,7 +103,7 @@ describe('$.data()', () => {
     const div = document.querySelector('div');
     $.data(div, objData);
     expect($.data(div)).toEqual(objData);
-  })
+  });
 
   test('Removing Data string', () => {
     document.body.innerHTML = '<div></div>';
@@ -119,5 +119,14 @@ describe('$.data()', () => {
 
     $.removeData(div);
     expect($.data(div)).toEqual(Object.create(null));
-  })
+  });
+
+  test('HasData', () => {
+    document.body.innerHTML = '<div></div>';
+    const div = document.querySelector('div');
+    expect($.hasData(div)).toBeFalsy();
+
+    $.data(div, 'key', 'empty')
+    expect($.hasData(div)).toBeTruthy();
+  });
 })
