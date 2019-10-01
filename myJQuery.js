@@ -219,19 +219,29 @@
 
   jQprotoObj.prop = function (keyName, value) {
     const element0 = this[0]
-    let retorno
-    if (Element.prototype.isPrototypeOf(element0)) {
-      if (value === undefined) {
-        retorno = element0[keyName]
+    let retorno = this
+    if (element0) {
+      if (Element.prototype.isPrototypeOf(element0)) {
+        if (value === undefined) {
+          if (typeof keyName === 'object') {
+            this.each(function () {
+              for (var propName in keyName) {
+                this[propName] = keyName[propName]
+              }
+            })
+          } else {
+            retorno = element0[keyName]
+          }
+        } else {
+          this.each(function (index, item) {
+            item[keyName] = typeof value === 'function' ? value.call(item, index, item[keyName]) : value
+          })
+        }
       } else {
-        this.each(function (index, item) {
-          item[keyName] = typeof value === 'function' ? value(index, item[keyName]) : value
-        })
+        if (value === undefined) return element0[keyName]
+        element0[keyName] = value
+        retorno = element0
       }
-    } else {
-      if (value === undefined) return element0[keyName]
-      element0[keyName] = value
-      retorno = element0
     }
     return retorno
   }

@@ -2,6 +2,9 @@
 Este es mi propio jQuery, con un enfoque ciertamente diferente.
 Aun está en desarrollo, así que iré enlistando todo lo que voy avanzando:
 
+- [Attributes](https://api.jquery.com/category/attributes/)
+	- [.prop()](https://api.jquery.com/prop/)
+
  - [Nucleo](https://api.jquery.com/category/core/)
 	 - [jQuery()](https://api.jquery.com/jQuery/)
 		 - [TAG, Clase, ID, con contexto](https://api.jquery.com/jQuery/#jQuery-selector-context)
@@ -31,6 +34,7 @@ Aun está en desarrollo, así que iré enlistando todo lo que voy avanzando:
 
  - [Utilities](https://api.jquery.com/category/utilities/)
 	 - [jQuery.each()](https://api.jquery.com/jQuery.each/)
+	
  - [Traversing](https://api.jquery.com/category/traversing/)
 	 - [Tree Traversal](https://api.jquery.com/category/traversing/tree-traversal/)
 		 - [.find()](https://api.jquery.com/find/)
