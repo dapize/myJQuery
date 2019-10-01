@@ -342,6 +342,17 @@
     return retorno
   }
 
+  jQproto.hasClass = function (className) {
+    let retorno = false
+    this.each(function () {
+      if (this.classList.contains(className)) {
+        retorno = true
+        return false
+      }
+    })
+    return retorno
+  }
+
   // Window.jQuery
   window.jQuery = function (selector, context) {
     let retorno
