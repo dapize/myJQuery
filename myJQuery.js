@@ -137,25 +137,31 @@
     })
   }
 
-  fn.jQuery.class = function (_this, names, method, state) {
-    if (typeof names === 'string') {
-      names = names.split(' ')
-      fn.jQuery.each(_this, function (index, item) {
-        names.forEach(function (name) {
-          item.classList[method](name)
-        })
-      })
-    } else if (typeof names === 'function') {
-      let className
-      fn.jQuery.each(_this, function (index, item) {
-        className = names.call(this, index, Array.prototype.join.call(item.classList, ' '), state)
-        if (className) {
-          className.split(' ').forEach(function (name) {
-            item.classList[method](name)
-          })
-        }
+  fn.jQuery.class = Object.create(null)
+  fn.jQuery.class.string = function (names, index, item, method) {
+    names.forEach(function (name) {
+      item.classList[method](name)
+    })
+  }
+  fn.jQuery.class.function = function (names, index, item, method, state) {
+    const className = names.call(item, index, Array.prototype.join.call(item.classList, ' '), state)
+    if (className) {
+      className.split(' ').forEach(function (name) {
+        item.classList[method](name)
       })
     }
+  }
+  fn.jQuery.class.addRemove = function (_this, names, method, state) {
+    let fnClass
+    if (typeof names === 'string') {
+      names = names.split(' ')
+      fnClass = this.string
+    } else if (typeof names === 'function') {
+      fnClass = this.function
+    }
+    fn.jQuery.each(_this, function (index, item) {
+      fnClass(names, index, item, method, state)
+    })
     return _this
   }
 
@@ -376,15 +382,15 @@
   }
 
   jQproto.addClass = function (className) {
-    return fn.jQuery.class(this, className, 'add')
+    return fn.jQuery.class.addRemove(this, className, 'add')
   }
 
   jQproto.removeClass = function (className) {
-    return fn.jQuery.class(this, className, 'remove')
+    return fn.jQuery.class.addRemove(this, className, 'remove')
   }
 
   jQproto.toggleClass = function (className, state) {
-    return fn.jQuery.class(this, className, state === undefined ? 'toggle' : state ? 'add' : 'remove', state)
+    return fn.jQuery.class.addRemove(this, className, state === undefined ? 'toggle' : state ? 'add' : 'remove', state)
   }
 
   // Window.jQuery
