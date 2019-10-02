@@ -4,7 +4,6 @@ Aun está en desarrollo, así que iré enlistando todo lo que voy avanzando:
 
 - [Attributes](https://api.jquery.com/category/attributes/)
 	- [.prop()](https://api.jquery.com/prop/)
-
  - [Nucleo](https://api.jquery.com/category/core/)
 	 - [jQuery()](https://api.jquery.com/jQuery/)
 		 - [TAG, Clase, ID, con contexto](https://api.jquery.com/jQuery/#jQuery-selector-context)
@@ -17,10 +16,12 @@ Aun está en desarrollo, así que iré enlistando todo lo que voy avanzando:
 			 - Con contexto: 0%
 			 - Con atributos: 0%
 		 - [Callback](https://api.jquery.com/jQuery/#jQuery3)
-		 
- - [CSS](https://api.jquery.com/category/css/)
-	 - [.hasClass()](https://api.jquery.com/hasClass/)
-	  
+-  [CSS](https://api.jquery.com/category/css/)
+	-  [.hasClass()](https://api.jquery.com/hasClass/)
+	- [.addClass()](https://api.jquery.com/addClass/)
+	- [.removeClass()](https://api.jquery.com/removeClass/)
+	- [.toggleClass()](https://api.jquery.com/toggleClass/)
+	
  - [Data](https://api.jquery.com/category/data/)
 	 - [.data()](https://api.jquery.com/data/)
 	 - [.removeData()](https://api.jquery.com/removeData/)

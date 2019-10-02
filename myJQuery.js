@@ -137,6 +137,28 @@
     })
   }
 
+  fn.jQuery.class = function (_this, names, method, state) {
+    if (typeof names === 'string') {
+      names = names.split(' ')
+      fn.jQuery.each(_this, function (index, item) {
+        names.forEach(function (name) {
+          item.classList[method](name)
+        })
+      })
+    } else if (typeof names === 'function') {
+      let className
+      fn.jQuery.each(_this, function (index, item) {
+        className = names.call(this, index, Array.prototype.join.call(item.classList, ' '), state)
+        if (className) {
+          className.split(' ').forEach(function (name) {
+            item.classList[method](name)
+          })
+        }
+      })
+    }
+    return _this
+  }
+
   fn.jQuery.onReady = null
   fn.jQuery.holdReady = false
   fn.jQuery.ready = function (cb) {
@@ -351,6 +373,18 @@
       }
     })
     return retorno
+  }
+
+  jQproto.addClass = function (className) {
+    return fn.jQuery.class(this, className, 'add')
+  }
+
+  jQproto.removeClass = function (className) {
+    return fn.jQuery.class(this, className, 'remove')
+  }
+
+  jQproto.toggleClass = function (className, state) {
+    return fn.jQuery.class(this, className, state === undefined ? 'toggle' : state ? 'add' : 'remove', state)
   }
 
   // Window.jQuery
