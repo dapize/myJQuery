@@ -17,7 +17,7 @@ Aun está en desarrollo, así que iré enlistando todo lo que voy avanzando:
 			 - Con atributos: 0%
 		 - [Callback](https://api.jquery.com/jQuery/#jQuery3)
 -  [CSS](https://api.jquery.com/category/css/)
-	-  [.hasClass()](https://api.jquery.com/hasClass/)
+	- [.hasClass()](https://api.jquery.com/hasClass/)
 	- [.addClass()](https://api.jquery.com/addClass/)
 	- [.removeClass()](https://api.jquery.com/removeClass/)
 	- [.toggleClass()](https://api.jquery.com/toggleClass/)
@@ -35,6 +35,7 @@ Aun está en desarrollo, así que iré enlistando todo lo que voy avanzando:
 
  - [Miscellaneous](https://api.jquery.com/category/miscellaneous/)
 	 - [.each()](https://api.jquery.com/each/)
+	 - [.toArray()](https://api.jquery.com/toArray/)
 
  - [Utilities](https://api.jquery.com/category/utilities/)
 	 - [jQuery.each()](https://api.jquery.com/jQuery.each/)

@@ -393,6 +393,16 @@
     return fn.jQuery.class.addRemove(this, className, state === undefined ? 'toggle' : state ? 'add' : 'remove', state)
   }
 
+  jQproto.toArray = function () {
+    const elements = []
+    let i = 0
+    while (i < this.length) {
+      elements.push(this[i])
+      i++
+    }
+    return elements
+  }
+
   // Window.jQuery
   window.jQuery = function (selector, context) {
     let retorno
