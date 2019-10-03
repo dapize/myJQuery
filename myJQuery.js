@@ -165,6 +165,15 @@
     return _this
   }
 
+  fn.jQuery.index = function (_this, index) {
+    let elements = _this
+    if (index < 0) {
+      elements = _this.toArray().reverse()
+      index = (index * -1) - 1
+    }
+    return elements[index]
+  }
+
   fn.jQuery.onReady = null
   fn.jQuery.holdReady = false
   fn.jQuery.ready = function (cb) {
@@ -401,6 +410,16 @@
       i++
     }
     return elements
+  }
+
+  jQproto.get = function (index) {
+    return fn.jQuery.index(this, index)
+  }
+
+  jQproto.eq = function (index) {
+    const retorno = new jQuery(this.get(index))
+    retorno.prevObject = this
+    return retorno
   }
 
   // Window.jQuery
