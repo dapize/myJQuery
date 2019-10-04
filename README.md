@@ -36,13 +36,18 @@ Aun está en desarrollo, así que iré enlistando todo lo que voy avanzando:
 		- [.html()](https://api.jquery.com/html/)
 
 - [Miscellaneous](https://api.jquery.com/category/miscellaneous/)
-	- [.each()](https://api.jquery.com/each/)
-	- [.toArray()](https://api.jquery.com/toArray/)
+	- [Collection Manipulation](https://api.jquery.com/category/miscellaneous/collection-manipulation/)
+		- [.each()](https://api.jquery.com/each/)
+	- [DOM Element Methods](https://api.jquery.com/category/miscellaneous/dom-element-methods/)
+		- [.toArray()](https://api.jquery.com/toArray/)
+		- [.get()](https://api.jquery.com/get/)
 
 - [Utilities](https://api.jquery.com/category/utilities/)
 	- [jQuery.each()](https://api.jquery.com/jQuery.each/)
 	- [jQuery.extend()](https://api.jquery.com/jQuery.extend/)
 
 - [Traversing](https://api.jquery.com/category/traversing/)
+	- [Filtering](https://api.jquery.com/category/traversing/filtering/)
+		- [.eq()](https://api.jquery.com/eq/)
 	- [Tree Traversal](https://api.jquery.com/category/traversing/tree-traversal/)
 		- [.find()](https://api.jquery.com/find/)
