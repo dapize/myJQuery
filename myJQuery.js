@@ -26,16 +26,19 @@
   }
   fn.obj.extend = Object.create(null)
   fn.obj.extend.deep = function (target, source) {
+    let sourceProp, targetProp
     for (var prop in source) {
-      if (typeof target[prop] === 'object') {
-        typeof source[prop] === 'object' ? arguments.callee(target[prop], source[prop]) : target[prop] = source[prop]
+      sourceProp = source[prop]
+      targetProp = target[prop]
+      if (typeof targetProp === 'object') {
+        typeof sourceProp === 'object' ? arguments.callee(targetProp, sourceProp) : target[prop] = sourceProp
       } else {
-        target[prop] = source[prop]
+        target[prop] = sourceProp
       }
     }
   }
   fn.obj.extend.replace = function (target, source) {
-    for(var prop in source) target[prop] = source[prop]
+    for (var prop in source) target[prop] = source[prop]
   }
 
   fn.string = Object.create(null)
