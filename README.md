@@ -4,42 +4,45 @@ Aun está en desarrollo, así que iré enlistando todo lo que voy avanzando:
 
 - [Attributes](https://api.jquery.com/category/attributes/)
 	- [.prop()](https://api.jquery.com/prop/)
- - [Nucleo](https://api.jquery.com/category/core/)
-	 - [jQuery()](https://api.jquery.com/jQuery/)
-		 - [TAG, Clase, ID, con contexto](https://api.jquery.com/jQuery/#jQuery-selector-context)
-		 - [Nodo real](https://api.jquery.com/jQuery/#jQuery-element)
-		 - [Nodos reales](https://api.jquery.com/jQuery/#jQuery-elementArray)
-		 - [Nodo jQuery](https://api.jquery.com/jQuery/#jQuery-selection)
-		 - [Objetos literales](https://api.jquery.com/jQuery/#jQuery-object)
-		 - [DOM String](https://api.jquery.com/jQuery/#jQuery2)
-			 - Sin contexto - 100%
-			 - Con contexto: 0%
-			 - Con atributos: 0%
-		 - [Callback](https://api.jquery.com/jQuery/#jQuery3)
+
+- [Nucleo](https://api.jquery.com/category/core/)
+	- [jQuery()](https://api.jquery.com/jQuery/)
+		- [TAG, Clase, ID, con contexto](https://api.jquery.com/jQuery/#jQuery-selector-context)
+		- [Nodo real](https://api.jquery.com/jQuery/#jQuery-element)
+		- [Nodos reales](https://api.jquery.com/jQuery/#jQuery-elementArray)
+		- [Nodo jQuery](https://api.jquery.com/jQuery/#jQuery-selection)
+		- [Objetos literales](https://api.jquery.com/jQuery/#jQuery-object)
+		- [DOM String](https://api.jquery.com/jQuery/#jQuery2)
+			- Sin contexto - 100%
+			- Con contexto: 0%
+			- Con atributos: 0%
+		- [Callback](https://api.jquery.com/jQuery/#jQuery3)
+
 -  [CSS](https://api.jquery.com/category/css/)
 	- [.hasClass()](https://api.jquery.com/hasClass/)
 	- [.addClass()](https://api.jquery.com/addClass/)
 	- [.removeClass()](https://api.jquery.com/removeClass/)
 	- [.toggleClass()](https://api.jquery.com/toggleClass/)
 	
- - [Data](https://api.jquery.com/category/data/)
-	 - [.data()](https://api.jquery.com/data/)
-	 - [.removeData()](https://api.jquery.com/removeData/)
-	 - [jQuery.data()](https://api.jquery.com/jQuery.data/)
-	 - [jQuery.removeData()](https://api.jquery.com/jQuery.removeData/)
-	 - [jQuery.hasData()](https://api.jquery.com/jQuery.hasData/)
+- [Data](https://api.jquery.com/category/data/)
+	- [.data()](https://api.jquery.com/data/)
+	- [.removeData()](https://api.jquery.com/removeData/)
+	- [jQuery.data()](https://api.jquery.com/jQuery.data/)
+	- [jQuery.removeData()](https://api.jquery.com/jQuery.removeData/)
+	- [jQuery.hasData()](https://api.jquery.com/jQuery.hasData/)
 
- - [Manipulation](https://api.jquery.com/category/manipulation/)
-	 - [DOM Insertion, Inside](https://api.jquery.com/category/manipulation/dom-insertion-inside/)
-		 - [.html()](https://api.jquery.com/html/)
+- [Manipulation](https://api.jquery.com/category/manipulation/)
+	- [DOM Insertion, Inside](https://api.jquery.com/category/manipulation/dom-insertion-inside/)
+		- [.html()](https://api.jquery.com/html/)
 
- - [Miscellaneous](https://api.jquery.com/category/miscellaneous/)
-	 - [.each()](https://api.jquery.com/each/)
-	 - [.toArray()](https://api.jquery.com/toArray/)
+- [Miscellaneous](https://api.jquery.com/category/miscellaneous/)
+	- [.each()](https://api.jquery.com/each/)
+	- [.toArray()](https://api.jquery.com/toArray/)
 
- - [Utilities](https://api.jquery.com/category/utilities/)
-	 - [jQuery.each()](https://api.jquery.com/jQuery.each/)
-	
- - [Traversing](https://api.jquery.com/category/traversing/)
-	 - [Tree Traversal](https://api.jquery.com/category/traversing/tree-traversal/)
-		 - [.find()](https://api.jquery.com/find/)
+- [Utilities](https://api.jquery.com/category/utilities/)
+	- [jQuery.each()](https://api.jquery.com/jQuery.each/)
+	- [jQuery.extend()](https://api.jquery.com/jQuery.extend/)
+
+- [Traversing](https://api.jquery.com/category/traversing/)
+	- [Tree Traversal](https://api.jquery.com/category/traversing/tree-traversal/)
+		- [.find()](https://api.jquery.com/find/)

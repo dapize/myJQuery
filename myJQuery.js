@@ -1,26 +1,4 @@
 (function (document, window) {
-  // Polyfill
-  (function () {
-    if (typeof Object.assign !== 'function') {
-      Object.defineProperty(Object, 'assign', {
-        value: function () {
-          const target = arguments[0], nArgs = arguments.length
-          let i = 1, obj
-          while(i < nArgs) {
-            obj = arguments[i]
-            Object.keys(obj).forEach(function (keyName) {
-              target[keyName] = obj[keyName]
-            })
-            i++
-          }
-          return target
-        },
-        writable: true,
-        configurable: true
-      })
-    }
-  }())
-
   // Data
   const data = new Map()
 
@@ -45,6 +23,22 @@
   fn.obj = Object.create(null)
   fn.obj.isLiteral = function (obj) {
     return Object.prototype.toString.call(obj).toLowerCase() === '[object object]'
+  }
+  fn.obj.extend = Object.create(null)
+  fn.obj.extend.deep = function (target, source) {
+    let sourceProp, targetProp
+    for (var prop in source) {
+      sourceProp = source[prop]
+      targetProp = target[prop]
+      if (typeof targetProp === 'object') {
+        typeof sourceProp === 'object' ? arguments.callee(targetProp, sourceProp) : target[prop] = sourceProp
+      } else {
+        target[prop] = sourceProp
+      }
+    }
+  }
+  fn.obj.extend.replace = function (target, source) {
+    for (var prop in source) target[prop] = source[prop]
   }
 
   fn.string = Object.create(null)
@@ -127,11 +121,11 @@
     this.each(function (i, element) {
       hasData = data.has(element)
       if (isObj) {
-        objSet = Object.assign(hasData ? data.get(element) : Object.create(null), keyName)
+        objSet = wjq.extend(true, hasData ? data.get(element) : Object.create(null), keyName)
       } else {
         objSet = Object.create(null)
         objSet[keyName] = value
-        if (hasData) objSet = Object.assign(data.get(element), objSet)
+        if (hasData) objSet = wjq.extend(true, data.get(element), objSet)
       }
       data.set(element, objSet)
     })
@@ -244,7 +238,7 @@
           element0[nameObjData][keyName] = value
         } else {
           if (isObj) {
-            element0[nameObjData] = Object.assign(element0[nameObjData], keyName)
+            element0[nameObjData] = wjq.extend(true, element0[nameObjData], keyName)
           } else {
             valData = element0[nameObjData][keyName]
           }
@@ -479,6 +473,16 @@
 
   wjq.hasData = function (element) {
     return data.has(element)
+  }
+
+  wjq.extend = function () {
+    const iTarget = typeof arguments[0] === 'boolean' ? 1 : 0
+    const target = arguments[iTarget]
+    const extendFn = fn.obj.extend[iTarget ? 'deep' : 'replace']
+    Array.prototype.slice.call(arguments, iTarget).forEach(function (obj) {
+      extendFn(target, obj)
+    })
+    return target
   }
 
   // Export jQuery
