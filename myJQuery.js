@@ -416,6 +416,30 @@
     return retorno
   }
 
+  jQproto.index = function (selector) {
+    let retorno = -1
+    if (selector) {
+      let fnIndex
+      if (selector instanceof HTMLElement) {
+        fnIndex = this.isEqualNode
+      } else if (typeof selector === 'string'){
+        fnIndex = this.matches
+      } else if (selector instanceof jQuery) {
+        
+      }
+
+      this.each(function (index) {
+        if (fnIndex(selector)) {
+          retorno = index
+          return false
+        }
+      })
+    } else{
+      retorno = Array.prototype.indexOf.call(this[0].parentNode.children, this[0])
+    }
+    return retorno
+  }
+
   // Window.jQuery
   window.jQuery = function (selector, context) {
     let retorno
