@@ -420,16 +420,19 @@
     let retorno = -1
     if (selector) {
       let fnIndex
-      if (selector instanceof HTMLElement) {
-        fnIndex = this.isEqualNode
-      } else if (typeof selector === 'string'){
-        fnIndex = this.matches
+      if (typeof selector === 'string') {
+        fnIndex = function () {
+          return this.matches(selector)
+        }
+      } else if (selector instanceof HTMLElement) {
+        fnIndex = function () {
+          return this.isEqualNode(selector)
+        }
       } else if (selector instanceof jQuery) {
         
       }
-
       this.each(function (index) {
-        if (fnIndex(selector)) {
+        if (fnIndex.call(this, selector)) {
           retorno = index
           return false
         }
