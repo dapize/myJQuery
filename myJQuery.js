@@ -3,177 +3,251 @@
   const data = new Map()
 
   // #region Utils Functions
-  const fn = Object.create(null)
+  const fn = {
+    random: {
+      number: function (length) {
+        let result = ''
+        let init = 1
+        while (init <= length) {
+          result += Math.floor((Math.random() * 9))
+          init++
+        }
+        return result
+      }
+    },
 
-  fn.random = Object.create(null)
-  fn.random.number = function (length) {
-    let result = ''
-    let init = 1
-    while (init <= length) {
-      result += Math.floor((Math.random() * 9))
-      init++
-    }
-    return result
-  }
+    regex: {
+      tag: /<[^>]+>/g,
+      id: /#[0-9a-zA-Z]/g
+    },
 
-  fn.regex = Object.create(null)
-  fn.regex.tag = /<[^>]+>/g
-  fn.regex.id = /#[0-9a-zA-Z]/g
-  
-  fn.obj = Object.create(null)
-  fn.obj.isLiteral = function (obj) {
-    return Object.prototype.toString.call(obj).toLowerCase() === '[object object]'
-  }
-  fn.obj.extend = Object.create(null)
-  fn.obj.extend.deep = function (target, source) {
-    let sourceProp, targetProp
-    for (var prop in source) {
-      sourceProp = source[prop]
-      targetProp = target[prop]
-      if (typeof targetProp === 'object') {
-        typeof sourceProp === 'object' ? arguments.callee(targetProp, sourceProp) : target[prop] = sourceProp
-      } else {
-        target[prop] = sourceProp
+    obj: {
+      isLiteral: function (obj) {
+        return Object.prototype.toString.call(obj).toLowerCase() === '[object object]'
+      },
+
+      extend: {
+        deep: function (target, source) {
+          let sourceProp, targetProp
+          for (var prop in source) {
+            sourceProp = source[prop]
+            targetProp = target[prop]
+            if (typeof targetProp === 'object') {
+              typeof sourceProp === 'object' ? arguments.callee(targetProp, sourceProp) : target[prop] = sourceProp
+            } else {
+              target[prop] = sourceProp
+            }
+          }
+        },
+        replace: function (target, source) {
+          if (typeof Object.assign !== 'function') {
+            for (var prop in source) target[prop] = source[prop]
+          } else {
+            Object.assign(target, source)
+          }
+        }
+      }
+    },
+
+    string: {
+      isDomString: function (stringHtml) {
+        return fn.regex.tag.test(stringHtml)
+      },
+
+      toNode: function (domString) {
+        const div = document.createElement('div')
+        div.innerHTML = domString
+        return div.childNodes
+      },
+
+      lowerCamelCase: function (txt, separator) {
+        separator = separator || ' '
+        return txt.split(separator).map(function (text, i) {
+          return i ? text.substring(0, 1).toUpperCase() + text.substring(1) : text
+        }).join('')
+      }
+    },
+
+    iteration: {
+      for: function (fnName, elements, cb) {
+        return Array.prototype[fnName].call(elements, function (element) {
+          cb(element)
+        })
+      }
+    },
+
+    jQuery: {
+      each: function (_this, cb) {
+        let i = 0, cbReturn
+        while(i < _this.length) {
+          cbReturn = cb.call(_this[i], i, _this[i])
+          if (cbReturn !== undefined && !cbReturn) break
+          i++
+        }
+        return _this
+      },
+      
+      find: {
+        selector: function (elements, element, selector) {
+          fn.iteration.for('forEach', element.querySelectorAll(selector), function (node) {
+            if (elements.indexOf(node) === -1) elements.push(node)
+          })
+        },
+
+        jQuery: function (elements, element, obj) {
+          fn.jQuery.each(obj, function () {
+            if (element.contains(this) && elements.indexOf(this) === -1) elements.push(this)
+          })
+        },
+
+        node: function (elements, element, node) {
+          if (element.contains(node) && elements.indexOf(node) === -1) elements.push(node)
+        },
+
+        core: function (selector, obj) {
+          let find
+          const elements = []
+          if (typeof selector === 'string') {
+            find = this.selector
+          } else if (selector instanceof jQuery) {
+            find = this.jQuery
+          } else {
+            find = this.node
+          }
+          fn.jQuery.each(obj, function () {
+            find(elements, this, selector)
+          })
+          return elements
+        }
+      },
+
+      data: {
+        name: function () {
+          return 'jQuery' + jQueryObj.prototype.jquery.split('.').join('')
+        },
+
+        obj: function (element) {
+          const preNameProp = this.name()
+          const filter = Object.keys(element).filter(function (name) {
+            return name.indexOf(preNameProp) >= 0
+          })
+          return filter.length ? filter[0] : false
+        },
+
+        set: function (keyName, value, isObj) {
+          let objSet, hasData
+          this.each(function (i, element) {
+            hasData = data.has(element)
+            if (isObj) {
+              objSet = wjq.extend(hasData ? data.get(element) : Object.create(null), keyName)
+            } else {
+              objSet = Object.create(null)
+              objSet[keyName] = value
+              if (hasData) objSet = wjq.extend(data.get(element), objSet)
+            }
+            data.set(element, objSet)
+          })
+        }
+      },
+
+      class: {
+        string: function (names, index, item, method) {
+          names.forEach(function (name) {
+            item.classList[method](name)
+          })
+        },
+
+        fn: function (names, index, item, method, state) {
+          const className = names.call(item, index, Array.prototype.join.call(item.classList, ' '), state)
+          if (className) {
+            className.split(' ').forEach(function (name) {
+              item.classList[method](name)
+            })
+          }
+        },
+
+        addRemove: function (_this, names, method, state) {
+          let fnClass
+          if (typeof names === 'string') {
+            names = names.split(' ')
+            fnClass = this.string
+          } else if (typeof names === 'function') {
+            fnClass = this.fn
+          }
+          fn.jQuery.each(_this, function (index, item) {
+            fnClass(names, index, item, method, state)
+          })
+          return _this
+        }
+      },
+
+      index: function (_this, index) {
+        let elements = _this
+        if (index < 0) {
+          elements = _this.toArray().reverse()
+          index = (index * -1) - 1
+        }
+        return elements[index]
+      },
+
+      traver: {
+        elements: function (arr, item, selector) {
+          if (arr.indexOf(item) === -1) {
+            if (selector) {
+              if (item.matches(selector)) arr.push(item)
+            } else {
+              arr.push(item)
+            }
+          }
+        },
+
+        specific: function (methodName, selector) {
+          let elements = [], element;
+          fn.jQuery.each(this, function () {
+            element = this[methodName];
+            while(element !== null && Element.prototype.isPrototypeOf(element)) {
+              fn.jQuery.traver.elements(elements, elemen, selector)
+              element = element[methodName];
+            }
+          });
+          return fn.jQuery.retorno.call(this, elements)
+        },
+
+        all: function (method, selector) {
+          let list = [], elements
+          fn.jQuery.each(this, function (i, element) {
+            elements = element[method]
+            if (elements !== null) {
+              if (elements.length) {
+                fn.iteration.for('forEach', elements, function (item) {
+                  fn.jQuery.traver.elements(list, item, selector)
+                })
+              } else {
+                if (!HTMLCollection.prototype.isPrototypeOf(elements)) {
+                  fn.jQuery.traver.elements(list, elements, selector)
+                }
+              }
+            }
+          });
+          return fn.jQuery.retorno.call(this, list)
+        }
+      },
+
+      onReady: null,
+
+      holdReady: false,
+
+      ready: function (cb) {
+        this.holdReady ? this.onReady = cb : document.addEventListener('DOMContentLoaded', cb)
+      },
+
+      retorno: function (fn) {
+        const retorno = new jQuery(fn)
+        retorno.prevObject = this
+        return retorno
       }
     }
   }
-  fn.obj.extend.replace = function (target, source) {
-    for (var prop in source) target[prop] = source[prop]
-  }
-
-  fn.string = Object.create(null)
-  fn.string.isDomString = function (stringHtml) {
-    return fn.regex.tag.test(stringHtml)
-  }
-  fn.string.toNode = function (domString) {
-    const div = document.createElement('div')
-    div.innerHTML = domString
-    return div.childNodes
-  }
-  fn.string.lowerCamelCase = function (txt, separator) {
-    separator = separator || ' '
-    return txt.split(separator).map(function (text, i) {
-      return i ? text.substring(0, 1).toUpperCase() + text.substring(1) : text
-    }).join('')
-  }
-
-  fn.iteration = Object.create(null)
-  fn.iteration.for = function (fnName, elements, cb) {
-    return Array.prototype[fnName].call(elements, function (element) {
-      cb(element)
-    })
-  }
-
-  fn.jQuery = Object.create(null)
-  fn.jQuery.each = function (_this, cb) {
-    let i = 0, cbReturn
-    while(i < _this.length) {
-      cbReturn = cb.call(_this[i], i, _this[i])
-      if (cbReturn !== undefined && !cbReturn) break
-      i++
-    }
-    return _this
-  }
-
-  fn.jQuery.find = Object.create(null)
-  fn.jQuery.find.selector = function (elements, element, selector) {
-    fn.iteration.for('forEach', element.querySelectorAll(selector), function (node) {
-      if (elements.indexOf(node) === -1) elements.push(node)
-    })
-  }
-  fn.jQuery.find.jQuery = function (elements, element, obj) {
-    fn.jQuery.each(obj, function () {
-      if (element.contains(this) && elements.indexOf(this) === -1) elements.push(this)
-    })
-  }
-  fn.jQuery.find.node = function (elements, element, node) {
-    if (element.contains(node) && elements.indexOf(node) === -1) elements.push(node)
-  }
-  fn.jQuery.find.core = function (selector, obj) {
-    let find
-    const elements = []
-    if (typeof selector === 'string') {
-      find = this.selector
-    } else if (selector instanceof jQuery) {
-      find = this.jQuery
-    } else {
-      find = this.node
-    }
-    fn.jQuery.each(obj, function () {
-      find(elements, this, selector)
-    })
-    return elements
-  }
-
-  fn.jQuery.data = Object.create(null)
-  fn.jQuery.data.name = function () {
-    return 'jQuery' + jQueryObj.prototype.jquery.split('.').join('')
-  }
-  fn.jQuery.data.obj = function (element) {
-    const preNameProp = this.name()
-    const filter = Object.keys(element).filter(function (name) {
-      return name.indexOf(preNameProp) >= 0
-    })
-    return filter.length ? filter[0] : false
-  }
-  fn.jQuery.data.set = function (keyName, value, isObj) {
-    let objSet, hasData
-    this.each(function (i, element) {
-      hasData = data.has(element)
-      if (isObj) {
-        objSet = wjq.extend(true, hasData ? data.get(element) : Object.create(null), keyName)
-      } else {
-        objSet = Object.create(null)
-        objSet[keyName] = value
-        if (hasData) objSet = wjq.extend(true, data.get(element), objSet)
-      }
-      data.set(element, objSet)
-    })
-  }
-
-  fn.jQuery.class = Object.create(null)
-  fn.jQuery.class.string = function (names, index, item, method) {
-    names.forEach(function (name) {
-      item.classList[method](name)
-    })
-  }
-  fn.jQuery.class.function = function (names, index, item, method, state) {
-    const className = names.call(item, index, Array.prototype.join.call(item.classList, ' '), state)
-    if (className) {
-      className.split(' ').forEach(function (name) {
-        item.classList[method](name)
-      })
-    }
-  }
-  fn.jQuery.class.addRemove = function (_this, names, method, state) {
-    let fnClass
-    if (typeof names === 'string') {
-      names = names.split(' ')
-      fnClass = this.string
-    } else if (typeof names === 'function') {
-      fnClass = this.function
-    }
-    fn.jQuery.each(_this, function (index, item) {
-      fnClass(names, index, item, method, state)
-    })
-    return _this
-  }
-
-  fn.jQuery.index = function (_this, index) {
-    let elements = _this
-    if (index < 0) {
-      elements = _this.toArray().reverse()
-      index = (index * -1) - 1
-    }
-    return elements[index]
-  }
-
-  fn.jQuery.onReady = null
-  fn.jQuery.holdReady = false
-  fn.jQuery.ready = function (cb) {
-    this.holdReady ? this.onReady = cb : document.addEventListener('DOMContentLoaded', cb)
-  }
-  
   // #endregion utils
 
   // #region jQuery Obj
@@ -238,7 +312,7 @@
           element0[nameObjData][keyName] = value
         } else {
           if (isObj) {
-            element0[nameObjData] = wjq.extend(true, element0[nameObjData], keyName)
+            element0[nameObjData] = wjq.extend(element0[nameObjData], keyName)
           } else {
             valData = element0[nameObjData][keyName]
           }
@@ -368,9 +442,7 @@
   }
 
   jQproto.find = function (selector) {
-    const retorno = new jQuery(fn.jQuery.find.core(selector, this))
-    retorno.prevObject = this
-    return retorno
+    return fn.jQuery.retorno.call(this, fn.jQuery.find.core(selector, this))
   }
 
   jQproto.hasClass = function (className) {
@@ -411,10 +483,119 @@
   }
 
   jQproto.eq = function (index) {
-    const retorno = new jQuery(this.get(index))
-    retorno.prevObject = this
-    return retorno
+    return fn.jQuery.retorno.call(this, this.get(index))
   }
+
+  jQproto.end = function () {
+    return this.prevObject
+  }
+
+  jQproto.filter = function (selector) {
+    const elements = []
+    let filterFn = false, selectors
+    if (typeof selector === 'string') {
+      filterFn = function () {
+        return this.matches(selector)
+      }
+    } else if (typeof selector == 'function') {
+      filterFn = function (index, item) {
+        return selector.call(this, index, item)
+      }
+    } else if (selector instanceof HTMLElement) {
+      filterFn = function () {
+        return this.isSameNode(selector)
+      }
+    } else if (selector.length) {
+      selectors = new jQuery(selector)
+    }
+
+    let filterFnEach
+    if (filterFn) {
+      filterFnEach = function (item, index) {
+        if (filterFn.call(this, index, item)) elements.push(item)
+      }
+    } else {
+      filterFnEach = function (item) {
+        if (selectors && selectors.length) {
+          selectors.each(function (i, element) {
+            if (element.isSameNode(item) && elements.indexOf(element) === -1) elements.push(element)
+          })
+        }
+      }
+    }
+
+    this.each(function (index, item) {
+      filterFnEach.call(this, item, index)
+    })
+    return fn.jQuery.retorno.call(this, elements)
+  }
+
+  jQproto.siblings = function (selector) {
+    const elements = []
+    this.each(function (i, item) {
+      fn.iteration.for('forEach', this.parentNode.children, function (child) {
+        if (elements.indexOf(child) === -1) {
+          if (selector) {
+            if (child.matches(selector)) elements.push(child)
+          } else {
+            if (!child.isSameNode(item)) elements.push(child)
+          }
+        }
+      })
+    })
+    return fn.jQuery.retorno.call(this, elements)
+  }
+
+  jQproto.children = function (selector) {
+    return fn.jQuery.traver.all.call(this, 'children', selector)
+  }
+
+  jQproto.contents = function () {
+    return fn.jQuery.traver.all.call(this, 'childNodes')
+  }
+
+  jQproto.next = function (selector) {
+    return fn.jQuery.traver.all.call(this, 'nextElementSibling', selector)
+  }
+
+  jQproto.nextAll = function (selector) {
+    return fn.jQuery.traver.specific.call(this, 'nextElementSibling', selector)
+  }
+
+  jQproto.prev = function (selector) {
+    return fn.jQuery.traver.all.call(this, 'previousElementSibling', selector)
+  }
+
+  jQproto.prevAll = function (selector) {
+    return fn.jQuery.traver.specific.call(this, 'previousElementSibling', selector)
+  }
+
+  jQproto.parent = function (selector) {
+    return fn.jQuery.traver.all.call(this, 'parentNode', selector)
+  }
+
+  jQproto.parents = function (selector) {
+    return fn.jQuery.traver.specific.call(this, 'parentNode', selector)
+  }
+
+  jQproto.offsetParent = function () {
+    // relative, absolute, or fixed
+
+  }
+
+  
+  jQproto.prevUntil = function (selector) {
+  }
+
+  jQproto.nextUntil = function (selector) {
+  }
+
+  jQproto.parentsUntil = function (selector) {
+  }
+
+  jQproto.closest = function (selector) {
+  }
+
 
   // Window.jQuery
   window.jQuery = function (selector, context) {
