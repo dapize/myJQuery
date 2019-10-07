@@ -206,7 +206,7 @@
           fn.jQuery.each(this, function () {
             element = this[methodName];
             while(element !== null && Element.prototype.isPrototypeOf(element)) {
-              fn.jQuery.traver.elements(elements, elemen, selector)
+              fn.jQuery.traver.elements(elements, element, selector)
               element = element[methodName];
             }
           });
@@ -554,6 +554,14 @@
     return fn.jQuery.traver.all.call(this, 'childNodes')
   }
 
+  jQproto.first = function () {
+    return fn.jQuery.retorno.call(this, this[0])
+  }
+
+  jQproto.last = function () {
+    return fn.jQuery.retorno.call(this, this[this.length - 1])
+  }
+
   jQproto.next = function (selector) {
     return fn.jQuery.traver.all.call(this, 'nextElementSibling', selector)
   }
@@ -578,12 +586,10 @@
     return fn.jQuery.traver.specific.call(this, 'parentNode', selector)
   }
 
+  /*
   jQproto.offsetParent = function () {
-    // relative, absolute, or fixed
-
   }
 
-  
   jQproto.prevUntil = function (selector) {
   }
 
@@ -594,6 +600,64 @@
   }
 
   jQproto.closest = function (selector) {
+  }
+  */
+
+  jQproto.css = function (propertyName, value) {
+    let retorno = this
+    if (typeof propertyName === 'string') {
+      if (value) {
+        let fnCss
+        if (typeof value === 'function') {
+          fnCss = function (index, val) {
+            const fnReturn = val.call(this, index, getComputedStyle(this).getPropertyValue(propertyName))
+            if (fnReturn !== undefined) {
+              const fnOperated = parseFloat(fnReturn);
+              this.style[propertyName] = (isNaN(fnOperated)) ? fnReturn : fnOperated + 'px'
+            }
+          }
+        } else { // string or number
+          if (typeof value === 'number') {
+            value = value + 'px'
+            fnCss = function (index, val) {
+              this.style[propertyName] = val
+            }
+          } else { // string
+            value = value.replace(/ /g, '')
+            let toOperate
+            if (value.indexOf('+=') !== -1 || value.indexOf('-=') !== -1) {
+              toOperate = Number(value.replace(/(\+)?(\-)?(\=)/g, ''))
+              if (value.indexOf('+=') !== -1) toOperate = toOperate * -1
+              fnCss = function () {
+                this.style[propertyName] = (parseFloat(getComputedStyle(this).getPropertyValue(propertyName)) - toOperate) + 'px'
+              }
+            } else {
+              fnCss = function (index, val) {
+                this.style[propertyName] = val
+              }
+            }  
+          }
+        }
+        this.each(function (index) {
+          fnCss.call(this, index, value)
+        })
+      } else {
+        retorno = getComputedStyle(this[0]).getPropertyValue(propertyName)
+      }
+    } else if (Array.isArray(propertyName)) {
+      retorno = Object.create(null)
+      propertyName.forEach(function (name) {
+        retorno[name] = getComputedStyle(this[0]).getPropertyValue(name)
+      })
+    } else if (typeof propertyName === 'object') {
+      let name
+      for (name in propertyName) {
+        this.each(function () {
+          this.style[name] = propertyName[name]
+        })
+      }
+    }
+    return retorno
   }
 
 
