@@ -433,7 +433,7 @@
   }
 
   const jQproto = jQuery.prototype = Object.create(jQprotoObj)
-  
+
   jQproto.ready = function (cb) {
     if (this[0] instanceof HTMLDocument) fn.jQuery.ready(cb)
   }
@@ -675,6 +675,36 @@
           this.style[name] = fnProp[typeof propertyName[name] + 'Fn'].call(this, name, index)
         })
       }
+    }
+    return retorno
+  }
+
+  // Dimensions
+  jQproto.height = function (value) {
+    let retorno = this
+    if (value) {
+      let fnHeight
+      switch(typeof value) {
+        case 'number':
+          fnHeight = function (val) {
+            return val + 'px'
+          }
+          break
+        case 'string':
+          fnHeight = function (val) {
+            return val
+          }
+          break
+        case 'function':
+          fnHeight = function (val) {
+            return fn.jQuery.css.retorno(this, val, index, 'height')
+          }
+      }
+      this.each(function (index, item) {
+        this.style.height = fnHeight.call(item, value, index)
+      })
+    } else {
+      retorno = getComputedStyle(this[0]).getPropertyValue('height')
     }
     return retorno
   }
