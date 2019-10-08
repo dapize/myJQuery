@@ -233,6 +233,20 @@
         }
       },
 
+      css: {
+        computed: function (element, propName) {
+          return getComputedStyle(element).getPropertyValue(propName)
+        },
+
+        retorno: function (_this, val, index, name) {
+          const returnVal = val.call(_this, index, this.computed(_this, name))
+          if (returnVal !== undefined) {
+            const valOperated = parseFloat(returnVal);
+            return (isNaN(valOperated)) ? returnVal : valOperated + 'px'
+          }
+        }
+      },
+
       onReady: null,
 
       holdReady: false,
@@ -419,7 +433,7 @@
   }
 
   const jQproto = jQuery.prototype = Object.create(jQprotoObj)
-
+  
   jQproto.ready = function (cb) {
     if (this[0] instanceof HTMLDocument) fn.jQuery.ready(cb)
   }
@@ -605,61 +619,65 @@
 
   jQproto.css = function (propertyName, value) {
     let retorno = this
+    const element0 = this[0]
     if (typeof propertyName === 'string') {
       if (value) {
         let fnCss
         if (typeof value === 'function') {
-          fnCss = function (index, val) {
-            const fnReturn = val.call(this, index, getComputedStyle(this).getPropertyValue(propertyName))
-            if (fnReturn !== undefined) {
-              const fnOperated = parseFloat(fnReturn);
-              this.style[propertyName] = (isNaN(fnOperated)) ? fnReturn : fnOperated + 'px'
-            }
+          fnCss = function (val, index) {
+            return fn.jQuery.css.retorno(this, val, index, propertyName)
           }
         } else { // string or number
           if (typeof value === 'number') {
-            value = value + 'px'
-            fnCss = function (index, val) {
-              this.style[propertyName] = val
+            fnCss = function (val) {
+              return val + 'px'
             }
           } else { // string
             value = value.replace(/ /g, '')
-            let toOperate
             if (value.indexOf('+=') !== -1 || value.indexOf('-=') !== -1) {
-              toOperate = Number(value.replace(/(\+)?(\-)?(\=)/g, ''))
+              let toOperate = Number(value.replace(/(\+)?(\-)?(\=)/g, ''))
               if (value.indexOf('+=') !== -1) toOperate = toOperate * -1
               fnCss = function () {
-                this.style[propertyName] = (parseFloat(getComputedStyle(this).getPropertyValue(propertyName)) - toOperate) + 'px'
+                return (parseFloat(fn.jQuery.css.computed(this, propertyName)) - toOperate) + 'px'
               }
             } else {
-              fnCss = function (index, val) {
-                this.style[propertyName] = val
+              fnCss = function (val) {
+                return val
               }
             }  
           }
         }
         this.each(function (index) {
-          fnCss.call(this, index, value)
+          this.style[propertyName] = fnCss.call(this, value, index)
         })
       } else {
-        retorno = getComputedStyle(this[0]).getPropertyValue(propertyName)
+        retorno = fn.jQuery.css.computed(element0, propertyName)
       }
     } else if (Array.isArray(propertyName)) {
       retorno = Object.create(null)
       propertyName.forEach(function (name) {
-        retorno[name] = getComputedStyle(this[0]).getPropertyValue(name)
+        retorno[name] = fn.jQuery.css.computed(element0, name)
       })
     } else if (typeof propertyName === 'object') {
-      let name
+      const fnProp = {
+        'numberFn': function (name) {
+          return propertyName[name] + 'px'
+        },
+        'stringFn': function (name) {
+          return propertyName[name]
+        },
+        'functionFn': function (name, index) {
+          return fn.jQuery.css.retorno(this, propertyName[name], index, name)
+        }
+      }
       for (name in propertyName) {
-        this.each(function () {
-          this.style[name] = propertyName[name]
+        this.each(function (index) {
+          this.style[name] = fnProp[typeof propertyName[name] + 'Fn'].call(this, name, index)
         })
       }
     }
     return retorno
   }
-
 
   // Window.jQuery
   window.jQuery = function (selector, context) {
