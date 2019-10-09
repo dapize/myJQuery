@@ -341,11 +341,14 @@
               retorno = fn.jQuery.css.dimentions.call(this, undefined, propertyName, true, value)
               break
 
-            case 'string':
-              break
-            
             case 'number':
-              break 
+            case 'string':
+              retorno = fn.jQuery.css.dimentions.call(this, value, propertyName, true, includeMargin)
+              break
+
+            case 'function':
+              
+              break
           }
           return retorno
         }
