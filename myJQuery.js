@@ -76,6 +76,37 @@
       }
     },
 
+    css: {
+      computed: function (element, propName) {
+        return getComputedStyle(element).getPropertyValue(propName)
+      },
+
+      mergeValues: function (element, propName, type) {
+        const _this = this
+        const properties = propName === 'height' ? [type + '-top', type + '-bottom'] : [type + '-left', type + '-right']
+        return properties.map(function (name) {
+          return parseFloat(_this.computed(element, name))
+        }).reduce(function (total, num) {
+          return total + num
+        }, 0)
+      },
+
+      pure: function (element, propName, includePadding, includeMargin) {
+        let currentVal = parseFloat(this.computed(element, propName))
+        if (propName === 'height' || propName === 'width') {
+          if (!includePadding) currentVal -= this.mergeValues(element, propName, 'padding')
+          if (includeMargin) currentVal += this.mergeValues(element, propName, 'margin')
+        }
+        return currentVal
+      }
+
+      /* 
+        jQproto.outerHeight = function (value, includeMargin) {
+          return fn.jQuery.css.outer.call(this, value, includeMargin, 'height')
+        }
+      */
+    },
+
     jQuery: {
       each: function (_this, cb) {
         let i = 0, cbReturn
@@ -202,14 +233,14 @@
         },
 
         specific: function (methodName, selector) {
-          let elements = [], element;
+          let elements = [], element
           fn.jQuery.each(this, function () {
-            element = this[methodName];
+            element = this[methodName]
             while(element !== null && Element.prototype.isPrototypeOf(element)) {
               fn.jQuery.traver.elements(elements, element, selector)
-              element = element[methodName];
+              element = element[methodName]
             }
-          });
+          })
           return fn.jQuery.retorno.call(this, elements)
         },
 
@@ -228,22 +259,95 @@
                 }
               }
             }
-          });
+          })
           return fn.jQuery.retorno.call(this, list)
         }
       },
 
       css: {
-        computed: function (element, propName) {
-          return getComputedStyle(element).getPropertyValue(propName)
+        
+        fn: function (value, includePadding, includeMargin) {
+          let fnCss
+          switch(typeof value) {
+            case 'number':
+              fnCss = function (val) {
+                return val + 'px'
+              }
+              break
+            case 'string':
+              if (value.indexOf('+=') !== -1 || value.indexOf('-=') !== -1) {
+                fnCss = function (val, propName) {
+                  let toOperate = Number(val.replace(/(\+)?(\-)?(\=)/g, ''))
+                  if (val.indexOf('+=') !== -1) toOperate = toOperate * -1
+                  return (fn.css.pure(this, propName, includePadding) - toOperate) + 'px'
+                }
+              } else {
+                fnCss = function (val) {
+                  return val
+                }
+              }
+              break
+            case 'function':
+              fnCss = function (val, propName, index) {
+                const returnVal = val.call(this, index, fn.css.pure(this, propName, includePadding))
+                if (returnVal !== undefined) {
+                  const valOperated = parseFloat(returnVal)
+                  return (isNaN(valOperated)) ? returnVal : valOperated + 'px'
+                }
+              }
+          }
+          return fnCss
         },
 
-        retorno: function (_this, val, index, name) {
-          const returnVal = val.call(_this, index, this.computed(_this, name))
-          if (returnVal !== undefined) {
-            const valOperated = parseFloat(returnVal);
-            return (isNaN(valOperated)) ? returnVal : valOperated + 'px'
+        dimentions: function (value, propertyName, includePadding, includeMargin) {
+          let retorno = this
+          if (value !== undefined) {
+            const fnCss = fn.jQuery.css.fn(value, includePadding, includeMargin)
+            fn.jQuery.each(this, function (index, item) {
+              item.style.height = fnCss.call(item, value, propertyName, index)
+            })
+          } else {
+            retorno = fn.css.pure(this[0], propertyName, includePadding, includeMargin)
           }
+          return retorno
+        },
+
+        /* 
+        
+          .outerWidth( [includeMargin ] )
+              .outerWidth( [includeMargin ] )
+          .outerWidth( value [, includeMargin ] )
+              .outerWidth( value [, includeMargin ] )
+              .outerWidth( function )
+
+          jQproto.height = function (value) {
+            return fn.jQuery.css.dimentions.call(this, value, 'height', false, false)
+          }
+
+          jQproto.outerHeight = function (value, includeMargin) {
+            return fn.jQuery.css.outer.call(this, value, includeMargin, 'height')
+          }
+
+        */
+
+        outer: function (value, includeMargin, propertyName) {
+          let retorno
+          switch(typeof value) {
+            case 'undefined':
+              retorno = fn.jQuery.css.dimentions.call(this, undefined, propertyName, true, false)
+              break
+
+            case 'boolean':
+              retorno = fn.jQuery.css.dimentions.call(this, undefined, propertyName, true, value)
+              break
+
+            case 'string':
+              break
+            
+            case 'number':
+              break 
+          }
+          return retorno
         }
       },
 
@@ -621,92 +725,49 @@
     let retorno = this
     const element0 = this[0]
     if (typeof propertyName === 'string') {
-      if (value) {
-        let fnCss
-        if (typeof value === 'function') {
-          fnCss = function (val, index) {
-            return fn.jQuery.css.retorno(this, val, index, propertyName)
-          }
-        } else { // string or number
-          if (typeof value === 'number') {
-            fnCss = function (val) {
-              return val + 'px'
-            }
-          } else { // string
-            value = value.replace(/ /g, '')
-            if (value.indexOf('+=') !== -1 || value.indexOf('-=') !== -1) {
-              let toOperate = Number(value.replace(/(\+)?(\-)?(\=)/g, ''))
-              if (value.indexOf('+=') !== -1) toOperate = toOperate * -1
-              fnCss = function () {
-                return (parseFloat(fn.jQuery.css.computed(this, propertyName)) - toOperate) + 'px'
-              }
-            } else {
-              fnCss = function (val) {
-                return val
-              }
-            }  
-          }
-        }
+      if (value !== undefined) {
+        const fnCss = fn.jQuery.css.fn(value)
         this.each(function (index) {
-          this.style[propertyName] = fnCss.call(this, value, index)
+          this.style[propertyName] = fnCss.call(this, value, propertyName, index)
         })
       } else {
-        retorno = fn.jQuery.css.computed(element0, propertyName)
+        retorno = fn.css.computed(element0, propertyName)
       }
     } else if (Array.isArray(propertyName)) {
       retorno = Object.create(null)
       propertyName.forEach(function (name) {
-        retorno[name] = fn.jQuery.css.computed(element0, name)
+        retorno[name] = fn.css.computed(element0, name)
       })
     } else if (typeof propertyName === 'object') {
-      const fnProp = {
-        'numberFn': function (name) {
-          return propertyName[name] + 'px'
-        },
-        'stringFn': function (name) {
-          return propertyName[name]
-        },
-        'functionFn': function (name, index) {
-          return fn.jQuery.css.retorno(this, propertyName[name], index, name)
-        }
-      }
       for (name in propertyName) {
         this.each(function (index) {
-          this.style[name] = fnProp[typeof propertyName[name] + 'Fn'].call(this, name, index)
+          this.style[name] = fn.jQuery.css.fn(propertyName[name]).call(this, propertyName[name], name, index)
         })
       }
+
     }
     return retorno
   }
 
   // Dimensions
   jQproto.height = function (value) {
-    let retorno = this
-    if (value) {
-      let fnHeight
-      switch(typeof value) {
-        case 'number':
-          fnHeight = function (val) {
-            return val + 'px'
-          }
-          break
-        case 'string':
-          fnHeight = function (val) {
-            return val
-          }
-          break
-        case 'function':
-          fnHeight = function (val) {
-            return fn.jQuery.css.retorno(this, val, index, 'height')
-          }
-      }
-      this.each(function (index, item) {
-        this.style.height = fnHeight.call(item, value, index)
-      })
-    } else {
-      retorno = getComputedStyle(this[0]).getPropertyValue('height')
-    }
-    return retorno
+    return fn.jQuery.css.dimentions.call(this, value, 'height', false, false)
+  }
+
+  jQproto.innerHeight = function (value) {
+    return fn.jQuery.css.dimentions.call(this, value, 'height', true, false)
+  }
+
+  jQproto.outerHeight = function (value, includeMargin) {
+    return fn.jQuery.css.outer.call(this, value, includeMargin, 'height')
+  }
+
+  jQproto.width = function (value) {
+    return fn.jQuery.css.dimentions.call(this, value, 'width', false, false)
+  }
+
+  jQproto.innerWidth = function (value) {
+    return fn.jQuery.css.dimentions.call(this, value, 'width', true, false)
   }
 
   // Window.jQuery
