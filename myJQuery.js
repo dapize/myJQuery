@@ -99,12 +99,6 @@
         }
         return currentVal
       }
-
-      /* 
-        jQproto.outerHeight = function (value, includeMargin) {
-          return fn.jQuery.css.outer.call(this, value, includeMargin, 'height')
-        }
-      */
     },
 
     jQuery: {
@@ -279,7 +273,7 @@
                 fnCss = function (val, propName) {
                   let toOperate = Number(val.replace(/(\+)?(\-)?(\=)/g, ''))
                   if (val.indexOf('+=') !== -1) toOperate = toOperate * -1
-                  return (fn.css.pure(this, propName, includePadding) - toOperate) + 'px'
+                  return (fn.css.pure(this, propName, includePadding, includeMargin) - toOperate) + 'px'
                 }
               } else {
                 fnCss = function (val) {
@@ -289,7 +283,7 @@
               break
             case 'function':
               fnCss = function (val, propName, index) {
-                const returnVal = val.call(this, index, fn.css.pure(this, propName, includePadding))
+                const returnVal = val.call(this, index, fn.css.pure(this, propName, includePadding, includeMargin))
                 if (returnVal !== undefined) {
                   const valOperated = parseFloat(returnVal)
                   return (isNaN(valOperated)) ? returnVal : valOperated + 'px'
@@ -298,13 +292,13 @@
           }
           return fnCss
         },
-
+        
         dimentions: function (value, propertyName, includePadding, includeMargin) {
           let retorno = this
           if (value !== undefined) {
             const fnCss = fn.jQuery.css.fn(value, includePadding, includeMargin)
             fn.jQuery.each(this, function (index, item) {
-              item.style.height = fnCss.call(item, value, propertyName, index)
+              item.style[propertyName] = fnCss.call(item, value, propertyName, index)
             })
           } else {
             retorno = fn.css.pure(this[0], propertyName, includePadding, includeMargin)
@@ -312,25 +306,7 @@
           return retorno
         },
 
-        /* 
-        
-          .outerWidth( [includeMargin ] )
-              .outerWidth( [includeMargin ] )
-          .outerWidth( value [, includeMargin ] )
-              .outerWidth( value [, includeMargin ] )
-              .outerWidth( function )
-
-          jQproto.height = function (value) {
-            return fn.jQuery.css.dimentions.call(this, value, 'height', false, false)
-          }
-
-          jQproto.outerHeight = function (value, includeMargin) {
-            return fn.jQuery.css.outer.call(this, value, includeMargin, 'height')
-          }
-
-        */
-
-        outer: function (value, includeMargin, propertyName) {
+        outer: function (value, propertyName, includeMargin) {
           let retorno
           switch(typeof value) {
             case 'undefined':
@@ -343,11 +319,8 @@
 
             case 'number':
             case 'string':
-              retorno = fn.jQuery.css.dimentions.call(this, value, propertyName, true, includeMargin)
-              break
-
             case 'function':
-              
+              retorno = fn.jQuery.css.dimentions.call(this, value, propertyName, true, includeMargin)
               break
           }
           return retorno
@@ -762,7 +735,7 @@
   }
 
   jQproto.outerHeight = function (value, includeMargin) {
-    return fn.jQuery.css.outer.call(this, value, includeMargin, 'height')
+    return fn.jQuery.css.outer.call(this, value, 'height', includeMargin)
   }
 
   jQproto.width = function (value) {
@@ -771,6 +744,10 @@
 
   jQproto.innerWidth = function (value) {
     return fn.jQuery.css.dimentions.call(this, value, 'width', true, false)
+  }
+
+  jQproto.outerWidth = function (value, includeMargin) {
+    return fn.jQuery.css.outer.call(this, value, 'width', includeMargin)
   }
 
   // Window.jQuery

@@ -23,6 +23,7 @@ Aun está en desarrollo, así que iré enlistando todo lo que voy avanzando:
 	- [.addClass()](https://api.jquery.com/addClass/)
 	- [.removeClass()](https://api.jquery.com/removeClass/)
 	- [.toggleClass()](https://api.jquery.com/toggleClass/)
+	- [.css()](https://api.jquery.com/css/)
 	
 - [Data](https://api.jquery.com/category/data/)
 	- [.data()](https://api.jquery.com/data/)
@@ -30,6 +31,13 @@ Aun está en desarrollo, así que iré enlistando todo lo que voy avanzando:
 	- [jQuery.data()](https://api.jquery.com/jQuery.data/)
 	- [jQuery.removeData()](https://api.jquery.com/jQuery.removeData/)
 	- [jQuery.hasData()](https://api.jquery.com/jQuery.hasData/)
+
+- [Dimensions](https://api.jquery.com/category/dimensions/)
+	- [.height()](https://api.jquery.com/height/)
+	- [.innerHeight()](https://api.jquery.com/innerHeight/)
+	- [.width()](https://api.jquery.com/width/)
+	- [.innerWidth()](https://api.jquery.com/innerWidth/)
+
 
 - [Manipulation](https://api.jquery.com/category/manipulation/)
 	- [DOM Insertion, Inside](https://api.jquery.com/category/manipulation/dom-insertion-inside/)
@@ -49,5 +57,21 @@ Aun está en desarrollo, así que iré enlistando todo lo que voy avanzando:
 - [Traversing](https://api.jquery.com/category/traversing/)
 	- [Filtering](https://api.jquery.com/category/traversing/filtering/)
 		- [.eq()](https://api.jquery.com/eq/)
+		- [.filter()](https://api.jquery.com/filter/)
+		- [.first()](https://api.jquery.com/first/)
+		- [.last()](https://api.jquery.com/last/)
+	
+	- [Miscellaneous Traversing](https://api.jquery.com/category/traversing/miscellaneous-traversal/)
+		- [.end()](https://api.jquery.com/end/)
+
 	- [Tree Traversal](https://api.jquery.com/category/traversing/tree-traversal/)
+		- [.children()](https://api.jquery.com/children/)
 		- [.find()](https://api.jquery.com/find/)
+		- [.next()](https://api.jquery.com/next/)
+		- [.nextAll()](https://api.jquery.com/nextAll/)
+		- [.prev()](https://api.jquery.com/prev/)
+		- [.prevAll()](https://api.jquery.com/prevAll/)
+		- [.parent()](https://api.jquery.com/parent/)
+		- [.parents()](https://api.jquery.com/parents/)
+		- [.siblings()](https://api.jquery.com/siblings/)
+
