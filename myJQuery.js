@@ -420,9 +420,7 @@
         if (value === undefined) {
           if (typeof keyName === 'object') {
             this.each(function () {
-              for (var propName in keyName) {
-                this[propName] = keyName[propName]
-              }
+              for (var propName in keyName) this[propName] = keyName[propName]
             })
           } else {
             retorno = element0[keyName]
@@ -436,6 +434,21 @@
         if (value === undefined) return element0[keyName]
         element0[keyName] = value
         retorno = element0
+      }
+    }
+    return retorno
+  }
+
+  jQprotoObj.removeProp = function (keyName) {
+    const element0 = this[0]
+    let retorno = this
+    if (element0 && keyName) {
+      if (Element.prototype.isPrototypeOf(element0)) {
+        this.each(function () {
+          delete this[keyName]
+        })
+      } else {
+        delete element0[keyName]
       }
     }
     return retorno
