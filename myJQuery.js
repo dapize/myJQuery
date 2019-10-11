@@ -78,7 +78,8 @@
 
     css: {
       computed: function (element, propName) {
-        return getComputedStyle(element).getPropertyValue(propName)
+        const style = getComputedStyle(element).getPropertyValue(propName);
+        return style === undefined || style === '' ? 0 : style
       },
 
       mergeValues: function (element, propName, type) {
@@ -94,8 +95,10 @@
       pure: function (element, propName, includePadding, includeMargin) {
         let currentVal = parseFloat(this.computed(element, propName))
         if (propName === 'height' || propName === 'width') {
-          if (!includePadding) currentVal -= this.mergeValues(element, propName, 'padding')
-          if (includeMargin) currentVal += this.mergeValues(element, propName, 'margin')
+          if (includePadding !== undefined && !includePadding && this.computed(element, 'box-sizing') === 'border-box') {
+            currentVal -= this.mergeValues(element, propName, 'padding')
+          }
+          if (includeMargin !== undefined && includeMargin) currentVal += this.mergeValues(element, propName, 'margin')
         }
         return currentVal
       }
@@ -206,15 +209,6 @@
         }
       },
 
-      index: function (_this, index) {
-        let elements = _this
-        if (index < 0) {
-          elements = _this.toArray().reverse()
-          index = (index * -1) - 1
-        }
-        return elements[index]
-      },
-
       traver: {
         elements: function (arr, item, selector) {
           if (arr.indexOf(item) === -1) {
@@ -258,7 +252,9 @@
         }
       },
 
-      css: {
+      css: {   
+
+        // fn.jQuery.css.dimentions.call(this, value, 'width', false, false)
         
         fn: function (value, includePadding, includeMargin) {
           let fnCss
@@ -573,7 +569,12 @@
   }
 
   jQproto.get = function (index) {
-    return fn.jQuery.index(this, index)
+    let elements = this
+    if (index < 0) {
+      elements = this.toArray().reverse()
+      index = (index * -1) - 1
+    }
+    return elements[index]
   }
 
   jQproto.eq = function (index) {
@@ -734,9 +735,11 @@
     return fn.jQuery.css.dimentions.call(this, value, 'height', true, false)
   }
 
+  /*
   jQproto.outerHeight = function (value, includeMargin) {
     return fn.jQuery.css.outer.call(this, value, 'height', includeMargin)
   }
+  */
 
   jQproto.width = function (value) {
     return fn.jQuery.css.dimentions.call(this, value, 'width', false, false)
@@ -746,9 +749,11 @@
     return fn.jQuery.css.dimentions.call(this, value, 'width', true, false)
   }
 
+  /*
   jQproto.outerWidth = function (value, includeMargin) {
     return fn.jQuery.css.outer.call(this, value, 'width', includeMargin)
   }
+  */
 
   // Window.jQuery
   window.jQuery = function (selector, context) {
