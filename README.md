@@ -4,6 +4,7 @@ Aun está en desarrollo, así que iré enlistando todo lo que voy avanzando:
 
 - [Attributes](https://api.jquery.com/category/attributes/)
 	- [.prop()](https://api.jquery.com/prop/)
+	- [.removeProp()](https://api.jquery.com/removeProp/)
 
 - [Nucleo](https://api.jquery.com/category/core/)
 	- [jQuery()](https://api.jquery.com/jQuery/)
