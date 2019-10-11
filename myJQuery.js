@@ -104,6 +104,25 @@
       }
     },
 
+    attr: function (value) {
+      let fnAttr
+      if (typeof value === 'string') {
+        fnAttr = function (name, value) {
+          this.setAttribute(name, value)
+        }
+      } else if (value === null) {
+        fnAttr = function (name) {
+          this.removeAttribute(name)
+        }
+      } else if (typeof value === 'function') {
+        fnAttr = function (name, value, index) {
+          const fnValue = value.call(this, index, this.getAttribute(name))
+          if (fnValue !== undefined) fnValue === null ? this.removeAttribute(name) : this.setAttribute(name, fnValue)
+        }
+      }
+      return fnAttr
+    },
+
     jQuery: {
       each: function (_this, cb) {
         let i = 0, cbReturn
@@ -412,6 +431,29 @@
     return valData
   }
 
+  jQprotoObj.removeData = function (keyName) {
+    const objData = fn.jQuery.data.obj(this)
+    if (objData) {
+      delete (keyName === undefined ? this[objData] : this[objData][keyName])
+    } else {
+      let getData
+      this.each(function () {
+        if (keyName === undefined) {
+          data.set(this, Object.create(null))
+        } else {
+          if (data.has(this)) {
+            if (!Array.isArray(keyName)) keyName = keyName.split(' ')
+            getData = data.get(this)
+            keyName.forEach(function (name) {
+              delete getData[name]
+            })
+          }
+        }
+      })
+    }
+    return this
+  }
+
   jQprotoObj.prop = function (keyName, value) {
     const element0 = this[0]
     let retorno = this
@@ -452,29 +494,6 @@
       }
     }
     return retorno
-  }
-
-  jQprotoObj.removeData = function (keyName) {
-    const objData = fn.jQuery.data.obj(this)
-    if (objData) {
-      delete (keyName === undefined ? this[objData] : this[objData][keyName])
-    } else {
-      let getData
-      this.each(function () {
-        if (keyName === undefined) {
-          data.set(this, Object.create(null))
-        } else {
-          if (data.has(this)) {
-            if (!Array.isArray(keyName)) keyName = keyName.split(' ')
-            getData = data.get(this)
-            keyName.forEach(function (name) {
-              delete getData[name]
-            })
-          }
-        }
-      })
-    }
-    return this
   }
 
   jQprotoObj.length = 0
@@ -729,12 +748,12 @@
         retorno[name] = fn.css.computed(element0, name)
       })
     } else if (typeof propertyName === 'object') {
-      for (name in propertyName) {
-        this.each(function (index) {
-          this.style[name] = fn.jQuery.css.fn(propertyName[name]).call(this, propertyName[name], name, index)
-        })
-      }
-
+      let name
+      this.each(function (index, item) {
+        for (name in propertyName) {
+          item.style[name] = fn.jQuery.css.fn(propertyName[name]).call(item, propertyName[name], name, index)
+        }
+      })
     }
     return retorno
   }
@@ -767,6 +786,48 @@
     return fn.jQuery.css.outer.call(this, value, 'width', includeMargin)
   }
   */
+
+  jQproto.attr = function (name, value) {
+    let retorno = this
+    if (value === undefined) {
+      if (typeof name === 'string') {
+        retorno = this[0].getAttribute(name)
+      } else if (typeof name === 'object') {
+        let attrName
+        this.each(function (index, item) {
+          for (attrName in name) {
+            (name[attrName] === null) ? item.removeAttribute(attrName) : item.setAttribute(attrName, name[attrName])
+          }
+        })
+      }
+    } else {
+      const fnAttr = fn.attr(value)
+      this.each(function (index, item) {
+        fnAttr.call(item, name, value, index)
+      }) 
+    }
+    return retorno
+  }
+
+  jQproto.removeAttr = function (name) {
+    this.each(function () {
+      this.removeAttribute(name)
+    })
+    return this
+  }
+
+  jQproto.val = function (value) { // falta terminar esto
+    let retorno = this
+    if (value === undefined) {
+      retorno = this[0].value
+    } else {
+      if (typeof value === 'string') {
+
+      } else if (typeof value === 'function') {
+
+      }
+    }
+  }
 
   // Window.jQuery
   window.jQuery = function (selector, context) {
