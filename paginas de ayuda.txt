@@ -1,0 +1,3 @@
+https://www.w3schools.com/cssref/css_selectors.asp
+https://www.w3schools.com/jsref/dom_obj_all.asp
+https://www.w3schools.com/jsref/dom_obj_event.asp
