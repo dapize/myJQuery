@@ -123,6 +123,39 @@
       return fnAttr
     },
 
+    value: function(value) {
+      let fnValue
+      if (Array.isArray(value)) {
+        fnValue = function (val, item) {
+          Array.prototype.forEach.call(item.querySelector('option'), function (option) {
+            val.every(function(valItem) {
+              if (option.value === valItem) {
+                option.selected = true
+                return false
+              } else if (option.textContent=== valItem) {
+                option.selected = true
+                return false
+              }
+              return true
+            })
+          })
+        }
+      } else if (typeof value === 'string') {
+        fnValue = function(val, item) {
+          item.value = val
+        }
+      } else if (typeof value === 'function') {
+        fnValue = function (val, item) {
+          if (item.tagName.toLowerCase() === 'select' && item.getAttribute('multiple')) {
+            
+          } else {
+            
+          }
+        }
+      }
+      return fnValue
+    },
+
     jQuery: {
       each: function (_this, cb) {
         let i = 0, cbReturn
@@ -819,14 +852,27 @@
   jQproto.val = function (value) { // falta terminar esto
     let retorno = this
     if (value === undefined) {
-      retorno = this[0].value
-    } else {
-      if (typeof value === 'string') {
-
-      } else if (typeof value === 'function') {
-
+      const element0 = this[0]
+      if (element0.tagName.toLowerCase() === 'select' && element0.getAttribute('multiple')) {
+        let selectedOption
+        retorno = Array.prototype.map.call(element0.querySelectorAll('option'), function(option) {
+          if (option.selected) {
+            selectedOption = option.value ? option.value : option.textContent
+          } else {  
+            selectedOption = false
+          }
+          return selectedOption
+        })
+      } else {
+        retorno = element0.value
       }
+    } else {
+      const fnValue = fn.value.fn(value)
+      this.each(function () {
+        fnValue.call(this, value)
+      })
     }
+    return retorno
   }
 
   // Window.jQuery
